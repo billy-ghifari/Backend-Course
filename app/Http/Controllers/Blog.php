@@ -13,6 +13,7 @@ class Blog extends Controller
     //Mengambil Data All Blog
     public function Getblog()
     {
+        $blog = "prabowo";
         try {
             $Blog = MBlog::get();
             return response()->json([
