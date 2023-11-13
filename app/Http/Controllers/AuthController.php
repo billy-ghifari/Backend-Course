@@ -10,7 +10,7 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $cok;
+
         $post_data = $request->validate([
             'name' => 'required|string',
             'email' => 'required|string|email|unique:users',
@@ -39,7 +39,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         try {
-            if (!\Auth::attempt($request->only('email', 'password'))) {
+            if (Auth::attempt($request->only('email', 'password'))) {
                 return response()->json([
                     'message' => 'Invalid login details'
                 ], 401);
