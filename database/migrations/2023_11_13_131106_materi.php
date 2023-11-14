@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('materi', function (Blueprint $table) {
             $table->id();
-            $table->string('list_materi');
+            $table->integer('r_id_kelas');
             $table->string('judul_materi');
             $table->string('link_materi');
             $table->string('deskripsi_materi');
