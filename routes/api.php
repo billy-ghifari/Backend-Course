@@ -6,6 +6,8 @@ use App\Http\Controllers\C_blog;
 use App\Http\Controllers\C_category;
 use App\Http\Controllers\C_kelas;
 use App\Http\Controllers\C_materi;
+use App\Http\Controllers\C_Review;
+use App\Http\Controllers\C_Riview;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,3 +43,6 @@ Route::delete('/deletekelas/{id}', [C_kelas::class, 'destroy']);
 Route::post('createmateri', [C_materi::class, 'post_materi']);
 Route::put('/editmateri/{id}', [C_materi::class, 'update']);
 Route::delete('/deletemateri/{id}', [C_materi::class, 'destroy']);
+
+//review
+Route::post('createreview', [C_Review::class, 'post_review']);
