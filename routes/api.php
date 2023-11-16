@@ -7,6 +7,8 @@ use App\Http\Controllers\C_blog;
 use App\Http\Controllers\C_category;
 use App\Http\Controllers\C_kelas;
 use App\Http\Controllers\C_materi;
+use App\Http\Controllers\C_Review;
+use App\Http\Controllers\C_Riview;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,3 +51,5 @@ Route::post('/activationsiswa/{id}', [C_admin::class, 'activationsiswa']);
 Route::post('/nonactivationsiswa/{id}', [C_admin::class, 'nonactivationsiswa']);
 
 Route::post('/activationkelas/{id}', [C_admin::class, 'activationkelas']);
+//review
+Route::post('createreview', [C_Review::class, 'post_review']);
