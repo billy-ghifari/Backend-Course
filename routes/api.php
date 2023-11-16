@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\C_admin;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\C_Auth;
 use App\Http\Controllers\C_blog;
@@ -41,3 +42,10 @@ Route::delete('/deletekelas/{id}', [C_kelas::class, 'destroy']);
 Route::post('createmateri', [C_materi::class, 'post_materi']);
 Route::put('/editmateri/{id}', [C_materi::class, 'update']);
 Route::delete('/deletemateri/{id}', [C_materi::class, 'destroy']);
+
+//admin action
+Route::get('getallsiswa', [C_admin::class, 'index']);
+Route::post('/activationsiswa/{id}', [C_admin::class, 'activationsiswa']);
+Route::post('/nonactivationsiswa/{id}', [C_admin::class, 'nonactivationsiswa']);
+
+Route::post('/activationkelas/{id}', [C_admin::class, 'activationkelas']);
