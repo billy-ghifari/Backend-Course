@@ -10,6 +10,13 @@ use Throwable;
 
 class C_blog extends Controller
 {
+    public function index()
+    {
+        $blogs = blog::latest()->paginate(5);
+        return response()->json(['message' => 'List data review', 'data' => $blogs]);
+    }
+
+
     public function post_blog(Request $request)
     {
         $validator = Validator::make($request->all(), [
