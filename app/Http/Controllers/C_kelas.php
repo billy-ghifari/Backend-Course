@@ -10,6 +10,12 @@ use Throwable;
 
 class C_kelas extends Controller
 {
+    public function index()
+    {
+        $kelas = kelas::latest()->paginate(2);
+        return response()->json(['message' => 'List data review', 'data' => $kelas]);
+    }
+
     public function post_kelas(Request $request)
     {
         $validator = Validator::make($request->all(), [
