@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
 
 class C_Auth extends Controller
 {
+    //login
     public function login(Request $request)
     {
         $login = Auth::attempt($request->all());
@@ -38,7 +39,9 @@ class C_Auth extends Controller
             ]);
         }
     }
+    //login
 
+    //register
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -77,13 +80,14 @@ class C_Auth extends Controller
             'success' => false,
         ]);
     }
+    //register
 
+    //forgot password
     public function forgetPassword(Request $request)
     {
         $request->validate([
             'email' => 'required|email'
         ]);
-
 
         $status = Password::sendResetLink($request->only('email'));
         if ($status == Password::RESET_LINK_SENT) {
@@ -113,7 +117,9 @@ class C_Auth extends Controller
         }
         return response()->json(['error' => __($status)]);
     }
+    //forgot password
 
+    //logout
     public function logout(Request $request)
     {
         if (Auth::user()) {
@@ -126,4 +132,5 @@ class C_Auth extends Controller
             return response()->json(['massage' => 'Unauthorized'], 401);
         }
     }
+    //logout
 }

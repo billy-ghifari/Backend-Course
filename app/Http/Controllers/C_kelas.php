@@ -10,12 +10,15 @@ use Throwable;
 
 class C_kelas extends Controller
 {
+    //show kelas
     public function index()
     {
         $kelas = kelas::latest()->paginate(2);
         return response()->json(['message' => 'List data review', 'data' => $kelas]);
     }
+    //show kelas
 
+    //create kelas
     public function post_kelas(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -44,8 +47,10 @@ class C_kelas extends Controller
 
         return response()->json(['message' => 'data berhasil ditambahkan', 'data' => $post], 200);
     }
+    //create kelas
 
-    public function update(Request $request, kelas $kelas, $id)
+    //update kelas
+    public function update(Request $request, $id)
     {
         $post = kelas::findOrFail($id);
 
@@ -69,7 +74,9 @@ class C_kelas extends Controller
 
         return response()->json(['message' => 'data berhasil diubah', 'data' => $post], 200);
     }
+    //update kelas
 
+    //deleted kelas
     public function destroy($id)
     {
         try {
@@ -95,4 +102,5 @@ class C_kelas extends Controller
             return response()->json($ex, 422);
         }
     }
+    //deleted kelas
 }

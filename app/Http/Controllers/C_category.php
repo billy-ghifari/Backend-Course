@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class C_category extends Controller
 {
+    //create category
     public function create(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -27,8 +28,10 @@ class C_category extends Controller
 
         return response()->json(['message' => 'data berhasil ditambahkan', 'data' => $category], 200);
     }
+    //create category
 
-    public function update(Request $request, category $categories, $id)
+    //update blog
+    public function update(Request $request, $id)
     {
         $category = category::findOrFail($id);
 
@@ -50,8 +53,10 @@ class C_category extends Controller
 
         return response()->json(['message' => 'data berhasil diubah', 'data' => $category], 200);
     }
+    //update blog
 
-    public function destroy(category $category, $id)
+    //deleted blog
+    public function destroy($id)
     {
         try {
             $deleted = category::findOrFail($id);
@@ -64,4 +69,5 @@ class C_category extends Controller
             return response()->json($ex, 422);
         }
     }
+    //deleted blog
 }
