@@ -58,6 +58,11 @@ Route::post('/nonactivationsiswa/{id}', [C_admin::class, 'nonactivationsiswa']);
 
 Route::post('/activationkelas/{id}', [C_admin::class, 'activationkelas']);
 
+//crud admin
+Route::post('registeradmin', [C_admin::class, 'registeradmin']);
+Route::put('/editadmin/{id}', [C_admin::class, 'updateadmin']);
+Route::delete('/deleteadmin/{id}', [C_admin::class, 'destroyadmin']);
+
 //review
 Route::post('createreview', [C_Review::class, 'post_review']);
 Route::delete('/deletereview/{id}', [C_Review::class, 'destroy']);
