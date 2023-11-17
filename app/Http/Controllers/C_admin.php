@@ -75,6 +75,8 @@ class C_admin extends Controller
     }
     //kelas pengaktifan
 
-
-
+    //crud admin
+    public function update($id)
+    {
+    }
 }
