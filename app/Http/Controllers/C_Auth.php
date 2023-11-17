@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -74,5 +76,54 @@ class C_Auth extends Controller
         return response()->json([
             'success' => false,
         ]);
+    }
+
+    public function forgetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+
+        $status = Password::sendResetLink($request->only('email'));
+        if ($status == Password::RESET_LINK_SENT) {
+            return response()->json(['status' => __($status)]);
+        }
+        return response()->json(['error' => __($status)]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|confirmed'
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => bcrypt($password)
+                ])->save();
+            }
+        );
+        if ($status == Password::PASSWORD_RESET) {
+            return response()->json(['status' => __($status)]);
+        }
+        return response()->json(['error' => __($status)]);
+    }
+
+    public function logout(Request $request)
+    {
+        if (Auth::user()) {
+            $request->user()->currentAccessToken()->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Logout Berhasil!',
+            ]);
+        } else {
+            return response()->json(['massage' => 'Unauthorized'], 401);
+        }
     }
 }
