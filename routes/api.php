@@ -63,15 +63,12 @@ Route::post('registeradmin', [C_admin::class, 'registeradmin']);
 Route::put('/editadmin/{id}', [C_admin::class, 'updateadmin']);
 Route::delete('/deleteadmin/{id}', [C_admin::class, 'destroyadmin']);
 
-<<<<<<< HEAD
 //crud mentor
 Route::post('registermentor', [C_admin::class, 'registermentor']);
 Route::put('/editmentor/{id}', [C_admin::class, 'updateadmin']);
 Route::delete('/deletementor/{id}', [C_admin::class, 'destroyadmin']);
 
 
-=======
->>>>>>> f38422b2c21f6b0ade7270e6219142fc66c72ebe
 //review
 Route::post('createreview', [C_Review::class, 'post_review']);
 Route::delete('/deletereview/{id}', [C_Review::class, 'destroy']);

@@ -131,17 +131,15 @@ class C_Auth extends Controller
     </div>';
 
             $mail->send();
-            echo 'Message has been sent';
+            return response()->json($resetLinkpass);
         } catch (Exception $e) {
             return response()->json("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
         }
     }
 
-    public function resetPassword(Request $request)
+    public function resetPassword(Request $request, $token)
     {
         $request->validate([
-            'token' => 'required',
-            'email' => 'required|email',
             'password' => 'required|confirmed'
         ]);
 
