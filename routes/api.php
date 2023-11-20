@@ -59,9 +59,15 @@ Route::post('/nonactivationsiswa/{id}', [C_admin::class, 'nonactivationsiswa']);
 Route::post('/activationkelas/{id}', [C_admin::class, 'activationkelas']);
 
 //crud admin
+Route::post('loginadmin', [C_admin::class, 'loginadmin']);
 Route::post('registeradmin', [C_admin::class, 'registeradmin']);
 Route::put('/editadmin/{id}', [C_admin::class, 'updateadmin']);
 Route::delete('/deleteadmin/{id}', [C_admin::class, 'destroyadmin']);
+
+//crud mentor
+Route::post('registermentor', [C_admin::class, 'registermentor']);
+Route::put('/editmentor/{id}', [C_admin::class, 'updateadmin']);
+Route::delete('/deletementor/{id}', [C_admin::class, 'destroyadmin']);
 
 
 //review
