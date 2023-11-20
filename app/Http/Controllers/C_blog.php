@@ -10,13 +10,15 @@ use Throwable;
 
 class C_blog extends Controller
 {
+    //read blog
     public function index()
     {
         $blogs = blog::latest()->paginate(5);
         return response()->json(['message' => 'List data review', 'data' => $blogs]);
     }
+    //read blog
 
-
+    //create blog
     public function post_blog(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -47,7 +49,9 @@ class C_blog extends Controller
 
         return response()->json(['message' => 'data berhasil ditambahkan', 'data' => $post], 200);
     }
+    //create blog
 
+    //update blog
     public function update(Request $request, blog $blog, $id)
     {
         $post = blog::findOrFail($id);
@@ -74,8 +78,9 @@ class C_blog extends Controller
 
         return response()->json(['message' => 'data berhasil diubah', 'data' => $post], 200);
     }
+    //update blog
 
-
+    //deleted blog
     public function destroy($id)
     {
         try {
@@ -101,4 +106,5 @@ class C_blog extends Controller
             return response()->json($ex, 422);
         }
     }
+    //deleted blog
 }

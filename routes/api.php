@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Password;
 //auth
 Route::post('login', [C_Auth::class, 'login']);
 Route::post('register', [C_Auth::class, 'register']);
-Route::post('/forget-password', [C_Auth::class, 'forgetPassword'])->name('forget.password');
+Route::post('/forget-password', [C_Auth::class, 'forgetPassword']);
 Route::get('/reset-password/{token}', [C_Auth::class, 'resetPassword'])->name('password.reset');
 Route::post('/reset-password', [C_Auth::class, 'resetPassword'])->name('password.update');
 Route::post('/logout', [C_Auth::class, 'logout']);
@@ -55,7 +55,6 @@ Route::delete('/deletemateri/{id}', [C_materi::class, 'destroy']);
 Route::get('getallsiswa', [C_admin::class, 'index']);
 Route::post('/activationsiswa/{id}', [C_admin::class, 'activationsiswa']);
 Route::post('/nonactivationsiswa/{id}', [C_admin::class, 'nonactivationsiswa']);
-
 Route::post('/activationkelas/{id}', [C_admin::class, 'activationkelas']);
 
 //crud admin
@@ -64,12 +63,15 @@ Route::post('registeradmin', [C_admin::class, 'registeradmin']);
 Route::put('/editadmin/{id}', [C_admin::class, 'updateadmin']);
 Route::delete('/deleteadmin/{id}', [C_admin::class, 'destroyadmin']);
 
+<<<<<<< HEAD
 //crud mentor
 Route::post('registermentor', [C_admin::class, 'registermentor']);
 Route::put('/editmentor/{id}', [C_admin::class, 'updateadmin']);
 Route::delete('/deletementor/{id}', [C_admin::class, 'destroyadmin']);
 
 
+=======
+>>>>>>> f38422b2c21f6b0ade7270e6219142fc66c72ebe
 //review
 Route::post('createreview', [C_Review::class, 'post_review']);
 Route::delete('/deletereview/{id}', [C_Review::class, 'destroy']);

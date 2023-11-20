@@ -9,6 +9,7 @@ use Throwable;
 
 class C_Review extends Controller
 {
+    //create review
     public function post_review(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -29,7 +30,9 @@ class C_Review extends Controller
         ]);
         return response()->json(['message' => 'data review berhasil ditambahkan', 'data' => $post], 200);
     }
+    //create review
 
+    //deleted review
     public function destroy($id)
     {
         try {
@@ -40,4 +43,5 @@ class C_Review extends Controller
             return response()->json($ex, 200);
         }
     }
+    //deleted review
 }

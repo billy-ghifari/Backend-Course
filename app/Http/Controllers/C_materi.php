@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\materi;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 class C_materi extends Controller
 {
+    //create materi
     public function post_materi(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -35,8 +35,10 @@ class C_materi extends Controller
 
         return response()->json(['message' => 'data berhasil ditambahkan', 'data' => $post], 200);
     }
+    //create materi
 
-    public function update(Request $request, materi $kelas, $id)
+    //update materi
+    public function update(Request $request, $id)
     {
         $post = materi::findOrFail($id);
 
@@ -66,7 +68,9 @@ class C_materi extends Controller
 
         return response()->json(['message' => 'data berhasil diubah', 'data' => $post], 200);
     }
+    //update materi
 
+    //deleted materi
     public function destroy($id)
     {
         try {
@@ -91,4 +95,5 @@ class C_materi extends Controller
             return response()->json($ex, 422);
         }
     }
+    //deleted materi
 }

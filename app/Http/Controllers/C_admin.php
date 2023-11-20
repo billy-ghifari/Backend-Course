@@ -32,7 +32,7 @@ class C_admin extends Controller
         }
     }
 
-    public function activationsiswa(Request $request, $id)
+    public function activationsiswa($id)
     {
         try {
             $user = User::findOrFail($id);
@@ -47,7 +47,7 @@ class C_admin extends Controller
         }
     }
 
-    public function nonactivationsiswa(Request $request, $id)
+    public function nonactivationsiswa($id)
     {
         try {
             $user = User::findOrFail($id);
@@ -64,7 +64,7 @@ class C_admin extends Controller
     //siswa pengaktifan
 
     //kelas pengaktifan
-    public function activationkelas(Request $request, $id)
+    public function activationkelas($id)
     {
         try {
             $kelas = kelas::findOrFail($id);
@@ -105,7 +105,6 @@ class C_admin extends Controller
             ]);
         }
     }
-
 
     public function registeradmin(Request $request)
     {
