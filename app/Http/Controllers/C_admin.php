@@ -106,7 +106,6 @@ class C_admin extends Controller
         }
     }
 
-
     public function registeradmin(Request $request)
     {
 

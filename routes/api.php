@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Password;
 //auth
 Route::post('login', [C_Auth::class, 'login']);
 Route::post('register', [C_Auth::class, 'register']);
-Route::post('/forget-password', [C_Auth::class, 'forgetPassword'])->name('forget.password');
+Route::post('/forget-password', [C_Auth::class, 'forgetPassword']);
 Route::get('/reset-password/{token}', [C_Auth::class, 'resetPassword'])->name('password.reset');
 Route::post('/reset-password', [C_Auth::class, 'resetPassword'])->name('password.update');
 Route::post('/logout', [C_Auth::class, 'logout']);
@@ -55,7 +55,6 @@ Route::delete('/deletemateri/{id}', [C_materi::class, 'destroy']);
 Route::get('getallsiswa', [C_admin::class, 'index']);
 Route::post('/activationsiswa/{id}', [C_admin::class, 'activationsiswa']);
 Route::post('/nonactivationsiswa/{id}', [C_admin::class, 'nonactivationsiswa']);
-
 Route::post('/activationkelas/{id}', [C_admin::class, 'activationkelas']);
 
 //crud admin
