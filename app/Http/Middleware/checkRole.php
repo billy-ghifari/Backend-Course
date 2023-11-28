@@ -18,13 +18,14 @@ class checkRole
     {
         $user = $request->user();
 
-        foreach ($roles as $role) {
+        foreach ($roles as $jabatan) {
             // Check if user has the role This check will depend on how your roles are set up
-            if ($user->hasRole($role))
+            if ($user->role == $jabatan) {
                 return $next($request);
+            }
         }
         return response()->json([
-            'message' => 'Unauthorized',
+            'message' => $roles,
         ], 403);
     }
 }

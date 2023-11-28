@@ -39,17 +39,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //category
     Route::controller(C_category::class)->group(function () {
-        Route::post('createcat', 'create')->middleware('forStatus:aktif', 'forRole:superadmin, admin, mentor');
-        Route::put('/editcat/{id}', 'update')->middleware('forStatus:aktif', 'forRole:superadmin, admin, mentor');
-        Route::delete('/deletecat/{id}', 'destroy')->middleware('forStatus:aktif', 'forRole:superadmin, admin, mentor');
+        Route::post('createcat', 'create')->middleware('forStatus:aktif', 'forRole:superadmin,admin,mentor');
+        Route::put('/editcat/{id}', 'update')->middleware('forStatus:aktif', 'forRole:superadmin,admin,mentor');
+        Route::delete('/deletecat/{id}', 'destroy')->middleware('forStatus:aktif', 'forRole:superadmin,admin,mentor');
     });
 
     //blog
     Route::controller(C_blog::class)->group(function () {
-        Route::post('createblog', 'post_blog')->middleware('forStatus:aktif', 'forRole:superadmin, admin, mentor');
-        Route::get('paginateblog', 'index')->middleware('forStatus:aktif', 'forRole:superadmin, admin, mentor');
-        Route::put('/editblog/{id}', 'update')->middleware('forStatus:aktif', 'forRole:superadmin, admin, mentor');
-        Route::delete('/deleteblog/{id}', 'destroy')->middleware('forStatus:aktif', 'forRole:superadmin, admin, mentor');
+        Route::post('createblog', 'post_blog')->middleware('forStatus:aktif', 'forRole:superadmin,admin,mentor');
+        Route::get('paginateblog', 'index')->middleware('forStatus:aktif', 'forRole:superadmin,admin,mentor');
+        Route::put('/editblog/{id}', 'update')->middleware('forStatus:aktif', 'forRole:superadmin,admin,mentor');
+        Route::delete('/deleteblog/{id}', 'destroy')->middleware('forStatus:aktif', 'forRole:superadmin,admin,mentor');
     });
 
     //kelas
