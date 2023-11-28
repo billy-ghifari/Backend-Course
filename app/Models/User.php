@@ -55,4 +55,10 @@ class User extends Authenticatable
 
         $this->notify(new ResetPasswordNotification($url));
     }
+
+
+    public function hasRole($roles)
+    {
+        return $this->roles === $roles; // Misalkan peran pengguna disimpan dalam kolom 'role'
+    }
 }

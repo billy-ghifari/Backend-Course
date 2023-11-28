@@ -22,8 +22,17 @@ class C_Auth extends Controller
     //login
     public function login(Request $request)
     {
-        $login = Auth::attempt($request->all());
         try {
+
+            $validator = Validator::make($request->all(), [
+                'email'    => 'required|email',
+                'password' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 422);
+            }
+
             if (Auth::attempt($request->only('email', 'password'))) {
                 $user = Auth::user();
                 $token = $request->user()->createToken('myAppToken')->plainTextToken;
@@ -39,8 +48,8 @@ class C_Auth extends Controller
             }
         } catch (\Exception $e) {
             return response()->json([
-                'response_code' =>  404,
-                'message'       =>  'gagal',
+                'response_code' => 404,
+                'message' => 'gagal'
             ]);
         }
     }
@@ -143,14 +152,16 @@ class C_Auth extends Controller
             'password' => 'required|confirmed'
         ]);
 
-        $status = Password::reset(
-            $request->only('email', 'password_confirmation', 'token'),
-            function ($user, $password) {
-                $user->forceFill([
-                    'password' => bcrypt($password)
-                ])->save();
-            }
-        );
+        $token =
+
+            $status = Password::reset(
+                $request->only('email', 'password_confirmation', 'token'),
+                function ($user, $password) {
+                    $user->forceFill([
+                        'password' => bcrypt($password)
+                    ])->save();
+                }
+            );
         if ($status == Password::PASSWORD_RESET) {
             return redirect()->route('reset-password'); // Ubah 'reset_password_success' sesuai dengan nama rute atau URL yang sesuai
         }

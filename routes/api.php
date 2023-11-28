@@ -7,6 +7,7 @@ use App\Http\Controllers\C_blog;
 use App\Http\Controllers\C_category;
 use App\Http\Controllers\C_kelas;
 use App\Http\Controllers\C_materi;
+use App\Http\Controllers\C_mentor;
 use App\Http\Controllers\C_Review;
 use Illuminate\Support\Facades\Password;
 
@@ -21,54 +22,81 @@ use Illuminate\Support\Facades\Password;
 |
 */
 
-//auth
-Route::post('login', [C_Auth::class, 'login']);
-Route::post('register', [C_Auth::class, 'register']);
-Route::post('/forget-password', [C_Auth::class, 'forgetPassword']);
-Route::get('/reset-password/{token}', [C_Auth::class, 'resetPassword'])->name('password.reset');
-Route::post('/reset-password', [C_Auth::class, 'resetPassword'])->name('password.update');
-Route::post('/logout', [C_Auth::class, 'logout']);
+Route::controller(C_Auth::class)->group(function () {
+    Route::post('login', 'login');
+    Route::post('register', 'register');
+});
 
-//category
-Route::post('createcat', [C_category::class, 'create']);
-Route::put('/editcat/{id}', [C_category::class, 'update']);
-Route::delete('/deletecat/{id}', [C_category::class, 'destroy']);
+Route::middleware('auth:sanctum')->group(function () {
 
-//blog
-Route::post('createblog', [C_blog::class, 'post_blog']);
-Route::get('paginateblog', [C_blog::class, 'index']);
-Route::put('/editblog/{id}', [C_blog::class, 'update']);
-Route::delete('/deleteblog/{id}', [C_blog::class, 'destroy']);
+    //auth
+    Route::controller(C_Auth::class)->group(function () {
+        Route::post('/forget-password', 'forgetPassword')->middleware('forStatus:aktif');
+        Route::get('/reset-password/{token}', 'resetpassword')->middleware('forStatus:aktif');
+        Route::post('/reset-password', 'resetpassword')->middleware('forStatus:aktif');
+        Route::post('/logout', 'logout')->middleware('forStatus:aktif');
+    });
 
-//kelas
-Route::post('createkelas', [C_kelas::class, 'post_kelas']);
-Route::get('paginatekelas', [C_kelas::class, 'index']);
-Route::put('/editkelas/{id}', [C_kelas::class, 'update']);
-Route::delete('/deletekelas/{id}', [C_kelas::class, 'destroy']);
+    //category
+    Route::controller(C_category::class)->group(function () {
+        Route::post('createcat', 'create')->middleware('forStatus:aktif', 'forRole:superadmin, admin, mentor');
+        Route::put('/editcat/{id}', 'update')->middleware('forStatus:aktif', 'forRole:superadmin, admin, mentor');
+        Route::delete('/deletecat/{id}', 'destroy')->middleware('forStatus:aktif', 'forRole:superadmin, admin, mentor');
+    });
 
-//materi
-Route::post('createmateri', [C_materi::class, 'post_materi']);
-Route::put('/editmateri/{id}', [C_materi::class, 'update']);
-Route::delete('/deletemateri/{id}', [C_materi::class, 'destroy']);
+    //blog
+    Route::controller(C_blog::class)->group(function () {
+        Route::post('createblog', 'post_blog')->middleware('forStatus:aktif', 'forRole:superadmin, admin, mentor');
+        Route::get('paginateblog', 'index')->middleware('forStatus:aktif', 'forRole:superadmin, admin, mentor');
+        Route::put('/editblog/{id}', 'update')->middleware('forStatus:aktif', 'forRole:superadmin, admin, mentor');
+        Route::delete('/deleteblog/{id}', 'destroy')->middleware('forStatus:aktif', 'forRole:superadmin, admin, mentor');
+    });
 
-//admin action
-Route::get('getallsiswa', [C_admin::class, 'index']);
-Route::post('/activationsiswa/{id}', [C_admin::class, 'activationsiswa']);
-Route::post('/nonactivationsiswa/{id}', [C_admin::class, 'nonactivationsiswa']);
-Route::post('/activationkelas/{id}', [C_admin::class, 'activationkelas']);
+    //kelas
+    Route::controller(C_kelas::class)->group(function () {
+        Route::post('createkelas', 'post_kelas')->middleware('forStatus:aktif', 'forRole:mentor');
+        Route::get('paginatekelas', 'index')->middleware('forStatus:aktif', 'forRole:mentor');
+        Route::put('/editkelas/{id}', 'update')->middleware('forStatus:aktif', 'forRole:mentor');
+        Route::delete('/deletekelas/{id}', 'destroy')->middleware('forStatus:aktif', 'forRole:mentor');
+    });
 
-//crud admin
-Route::post('loginadmin', [C_admin::class, 'loginadmin']);
-Route::post('registeradmin', [C_admin::class, 'registeradmin']);
-Route::put('/editadmin/{id}', [C_admin::class, 'updateadmin']);
-Route::delete('/deleteadmin/{id}', [C_admin::class, 'destroyadmin']);
+    //materi
+    Route::controller(C_materi::class)->group(function () {
+        Route::post('createmateri', 'post_materi')->middleware('forStatus:aktif');
+        Route::put('/editmateri/{id}', 'update')->middleware('forStatus:aktif');
+        Route::delete('/deletemateri/{id}', 'destroy')->middleware('forStatus:aktif');
+    });
 
-//crud mentor
-Route::post('registermentor', [C_admin::class, 'registermentor']);
-Route::put('/editmentor/{id}', [C_admin::class, 'updateadmin']);
-Route::delete('/deletementor/{id}', [C_admin::class, 'destroyadmin']);
+    //admin action
+    Route::controller(C_admin::class)->group(function () {
+        Route::get('getallsiswa', 'index')->middleware('forStatus:aktif');
+        Route::post('/activationsiswa/{id}', 'activationsiswa')->middleware('forStatus:aktif');
+        Route::post('/nonactivationsiswa/{id}', 'nonactivationsiswa')->middleware('forStatus:aktif');
+        Route::post('/activationkelas/{id}', 'activationkelas')->middleware('forStatus:aktif');
+    });
 
+    //crud admin
+    Route::controller(C_admin::class)->group(function () {
+        Route::post('loginadmin', 'loginadmin')->middleware('forStatus:aktif');
+        Route::post('registeradmin', 'registeradmin')->middleware('forStatus:aktif');
+        Route::put('/editadmin/{id}', 'updateadmin')->middleware('forStatus:aktif');
+        Route::delete('/deleteadmin/{id}', 'destroyadmin')->middleware('forStatus:aktif');
+    });
 
-//review
-Route::post('createreview', [C_Review::class, 'post_review']);
-Route::delete('/deletereview/{id}', [C_Review::class, 'destroy']);
+    //crud mentor
+    Route::controller(C_mentor::class)->group(function () {
+        Route::post('registermentor', 'registermentor')->middleware('forStatus:aktif');
+        Route::put('/editmentor/{id}', 'updateadmin')->middleware('forStatus:aktif');
+        Route::delete('/deletementor/{id}', 'destroyadmin')->middleware('forStatus:aktif');
+    });
+
+    //review
+    Route::controller(C_Review::class)->group(function () {
+        Route::post('createreview', 'post_review')->middleware('forStatus:aktif');
+        Route::delete('/deletereview/{id}', 'destroy')->middleware('forStatus:aktif');
+    });
+});
+
+Route::any('/{any}', function () {
+    return response()->json(['message' => 'Not Found'], 404);
+})->where('any', '.*');
