@@ -25,8 +25,7 @@ use Illuminate\Support\Facades\Password;
 Route::post('login', [C_Auth::class, 'login']);
 Route::post('register', [C_Auth::class, 'register']);
 Route::post('/forget-password', [C_Auth::class, 'forgetPassword']);
-Route::get('/reset-password/{token}', [C_Auth::class, 'resetPassword'])->name('password.reset');
-Route::post('/reset-password', [C_Auth::class, 'resetPassword'])->name('password.update');
+Route::post('/reset-password/{token}', [C_Auth::class, 'resetPassword']);
 Route::post('/logout', [C_Auth::class, 'logout']);
 
 //category
