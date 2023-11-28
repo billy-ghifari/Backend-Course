@@ -17,7 +17,7 @@ class C_Review extends Controller
             'review'     => 'required',
             'r_id_kelas' => 'required'
         ]);
-
+        // aa
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
