@@ -19,6 +19,7 @@ class AuthHelper
 {
     public static function login(Request $request)
     {
+        // aa
         if (Auth::attempt($request->only('email', 'password'))) {
             $user = Auth::user();
             $token = $request->user()->createToken('myAppToken')->plainTextToken;
