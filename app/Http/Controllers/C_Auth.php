@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Authhelper\AuthHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use illuminate\Support\Str;
@@ -17,7 +18,6 @@ use Illuminate\Support\Facades\Validator;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\SMTP;
-use App\Helpers\Authhelper\AuthHelper;
 
 class C_Auth extends Controller
 {

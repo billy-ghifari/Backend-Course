@@ -1,6 +1,10 @@
 <?php
 
+<<<<<<< HEAD
 namespace App\Helpers\Authhelper;
+=======
+namespace App\Helper\Authhelper;
+>>>>>>> raffa
 
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -19,7 +23,10 @@ class AuthHelper
 {
     public static function login(Request $request)
     {
+<<<<<<< HEAD
         // aa
+=======
+>>>>>>> raffa
         if (Auth::attempt($request->only('email', 'password'))) {
             $user = Auth::user();
             $token = $request->user()->createToken('myAppToken')->plainTextToken;
