@@ -3,25 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use illuminate\Support\Str;
-use App\Models\User;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-use PHPMailer\PHPMailer\SMTP;
 use App\Helpers\Authhelper\AuthHelper;
 
 class C_Auth extends Controller
 {
-    //login
     public function login(Request $request)
     {
         try {
@@ -44,42 +30,61 @@ class C_Auth extends Controller
             ]);
         }
     }
-    //login
 
-    //register
     public function register(Request $request)
     {
-        $response = AuthHelper::register($request);
-        return $response;
-    }
-    //register
+        $validator = Validator::make($request->all(), [
+            'name'     => 'required',
+            'email'    => 'required|email|unique:users',
+            'password' => 'required',
+            'photo'    => 'required|image'
+        ]);
 
-    //forgot password
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $validatordata = $validator->validated();
+        $user = AuthHelper::register($validatordata);
+
+        if ($user) {
+            return response()->json([
+                'success' => true,
+                'user'   => $user,
+            ], 201);
+        }
+
+        return response()->json([
+            'success' => false,
+        ]);
+    }
+
     public function forgetPassword(Request $request)
     {
-        $response = AuthHelper::forgetPassword($request);
-        return $response;
+        $validator = Validator::make($request->all(), [
+            'email'     => 'required|email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+
+        $email = $request->input('email');
+        $resetLink = AuthHelper::forgetPassword($email);
+
+        return response()->json($resetLink);
     }
 
     public function resetPassword(Request $request, $token)
     {
-        $response = AuthHelper::resetPassword($request, $token);
+        $request->validate([
+            'password' => 'required',
+        ]);
+
+        $password = $request->input('password');
+        $response = AuthHelper::resetPassword($token, $password);
+
         return $response;
     }
-    //forgot password
-
-    //logout
-    public function logout(Request $request)
-    {
-        if (Auth::user()) {
-            $request->user()->currentAccessToken()->delete();
-            return response()->json([
-                'success' => true,
-                'message' => 'Logout Berhasil!',
-            ]);
-        } else {
-            return response()->json(['massage' => 'Unauthorized'], 401);
-        }
-    }
-    //logout
 }

@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use illuminate\Support\Str;
@@ -42,21 +41,10 @@ class AuthHelper
         }
     }
 
-    public static function register(Request $request)
+    public static function register($validatordata)
     {
-        $validator = Validator::make($request->all(), [
-            'name'     => 'required',
-            'email'    => 'required|email|unique:users',
-            'password' => 'required',
-            'photo'    => 'required|image'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-        $validatordata = $validator->validated();
         $imageName = time() . '.' . $validatordata['photo']->extension();
-        $request->photo->move(public_path('profile'), $imageName);
+        $validatordata['photo']->move(public_path('profile'), $imageName);
         $validatordata['photo'] = $imageName;
 
         $user = User::create([
@@ -66,19 +54,10 @@ class AuthHelper
             'photo'    => $validatordata['photo']
         ]);
 
-        if ($user) {
-            return response()->json([
-                'success' => true,
-                'user'   => $user,
-            ], 201);
-        }
-
-        return response()->json([
-            'success' => false,
-        ]);
+        return $user;
     }
 
-    public static function forgetPassword(Request $request)
+    public static function forgetPassword($email)
     {
         try {
             $mail = new PHPMailer(true);
@@ -91,31 +70,26 @@ class AuthHelper
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
             $mail->Port       = 465;
 
-            $validator = Validator::make($request->all(), [
-                'email'     => 'required',
-            ]);
-
-            $validatordata = $validator->validated();
-
             $mail->setFrom('dtc@dinta.co.id', 'Dinta Training Camp');
-            $mail->addAddress($validatordata['email']);
+            $mail->addAddress($email);
 
-            $checkemail = DB::table('password_reset_tokens')
-                ->where('email', $validatordata['email'])
+            $user = Auth::user();
+
+            $checkEmail = DB::table('password_reset_tokens')
+                ->where('email', $email)
                 ->first();
 
-            if ($checkemail) {
+            if ($checkEmail) {
                 DB::table('password_reset_tokens')
-                    ->where('email', $validatordata['email'])
+                    ->where('email', $email)
                     ->delete();
             }
 
             $token = Str::random(60);
-
             $resetLinkpass = "http://127.0.0.1:1234/api/reset-password/$token";
 
             DB::table('password_reset_tokens')->insert([
-                'email' => $validatordata['email'],
+                'email' => $email,
                 'token' => $token,
                 'created_at' => Carbon::now(),
             ]);
@@ -124,34 +98,32 @@ class AuthHelper
             $mail->Subject = 'halo';
             $mail->Body = "Hello,\n\n";
             $mail->Body .= "To reset your password, please click on the following link:\n";
-            $mail->Body .= '
-    <div>
-        <a href="$resetLinkpass">Reset Link</a>
-    </div>';
+            $mail->Body .= '<div><a href="' . $resetLinkpass . '">Reset Link</a></div>';
 
             $mail->send();
-            return response()->json($resetLinkpass);
+            return $resetLinkpass;
         } catch (Exception $e) {
-            return response()->json("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
+            return "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
         }
     }
 
-    public static function resetPassword(Request $request, $token)
+    public static function resetPassword($token, $password)
     {
-        $request->validate([
-            'password' => 'required',
-        ]);
         $passwordReset = DB::table('password_reset_tokens')->where('token', $token)->first();
         if (!$passwordReset) {
             return response()->json(['message' => 'Invalid token'], 404);
         }
+
         $user = User::where('email', $passwordReset->email)->first();
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
-        $user->password = Hash::make($request->password);
+
+        $user->password = Hash::make($password);
         $user->save();
+
         DB::table('password_reset_tokens')->where('email', $passwordReset->email)->delete();
+
         return response()->json(['message' => 'Password has been reset successfully']);
     }
 }

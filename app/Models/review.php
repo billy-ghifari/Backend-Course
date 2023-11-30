@@ -14,4 +14,6 @@ class review extends Model
     protected $table = 'review';
 
     protected $guarded = ['id'];
+
+    protected $fillable = ['r_id_siswa', 'r_id_kelas', 'rating', 'review'];
 }
