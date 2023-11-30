@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helpers\Authhelper;
+namespace App\Helper\Authhelper;
 
 use App\Models\User;
 use Illuminate\Http\Request;

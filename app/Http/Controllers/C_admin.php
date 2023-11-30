@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Adminhelper;
 use App\Models\kelas;
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -19,14 +21,10 @@ class C_admin extends Controller
     public function index()
     {
         try {
-            $user = Auth::user();
 
-            if (!$user) {
-                return response()->json(['message' => 'Unauthorized'], 401);
-            }
+            $allsiswa = Adminhelper::allsiswa();
 
-            $siswa = User::where('role', 'siswa')->get();
-            return response()->json($siswa);
+            return $allsiswa;
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
@@ -35,28 +33,34 @@ class C_admin extends Controller
     public function activationsiswa($id)
     {
         try {
-            $user = User::findOrFail($id);
 
-            $user->update([
-                'status' => 'aktif'
-            ]);
+            try {
+                $siswa = user::findOrFail($id);
+            } catch (ModelNotFoundException $e) {
+                return response()->json("Tidak dapat menemukan siswa", 422);
+            }
 
-            return response()->json(['message' => 'akun sudah aktif', 'data' => $user], 200);
+            $activation = Adminhelper::activation($siswa);
+
+            return $activation;
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Gagal aktivasi ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Gagal aktivasi '], 500);
         }
     }
 
     public function nonactivationsiswa($id)
     {
         try {
-            $user = User::findOrFail($id);
 
-            $user->update([
-                'status' => 'non'
-            ]);
+            try {
+                $siswa = user::findOrFail($id);
+            } catch (ModelNotFoundException $e) {
+                return response()->json("Tidak dapat menemukan siswa", 422);
+            }
 
-            return response()->json(['message' => 'akun sudah dinonaktifkan', 'data' => $user], 200);
+            $nonactivation = Adminhelper::nonactivation($siswa);
+
+            return $nonactivation;
         } catch (\Exception $e) {
             return response()->json(['message' => 'Gagal aktivasi ' . $e->getMessage()], 500);
         }
@@ -81,30 +85,6 @@ class C_admin extends Controller
     //kelas pengaktifan
 
     //crud admin
-    public function loginadmin(Request $request)
-    {
-        $login = Auth::attempt($request->all());
-        try {
-            if (Auth::attempt($request->only('email', 'password'))) {
-                $user = Auth::user();
-                $token = $request->user()->createToken('myAppToken')->plainTextToken;
-
-                return response()->json([
-                    'response_code' =>   200,
-                    'message'       =>  'login berhasil',
-                    'content'       =>  $user,
-                    'token'         =>  Crypt::encrypt($token)
-                ]);
-            } else {
-                throw new \Exception('invalid credentials');
-            }
-        } catch (\Exception $e) {
-            return response()->json([
-                'response_code' =>  404,
-                'message'       =>  'gagal',
-            ]);
-        }
-    }
 
     public function registeradmin(Request $request)
     {
@@ -126,26 +106,9 @@ class C_admin extends Controller
         $request->photo->move(public_path('profile'), $imageName);
         $validatordata['photo'] = $imageName;
 
+        $makeadmin = Adminhelper::makeadmin($validatordata);
 
-        $user = User::create([
-            'name'     => $validatordata['name'],
-            'email'    => $validatordata['email'],
-            'password' => bcrypt($validatordata['password']),
-            'photo'    => $validatordata['photo'],
-            'role'     => 'admin',
-            'status'   => 'aktif'
-        ]);
-
-        if ($user) {
-            return response()->json([
-                'success' => true,
-                'user'   => $user,
-            ], 201);
-        }
-
-        return response()->json([
-            'success' => false,
-        ]);
+        return $makeadmin;
     }
 
 
@@ -166,19 +129,9 @@ class C_admin extends Controller
 
             $validatordata = $validator->validated();
 
-            if ($request->all()) {
-                $admin->update([
-                    'name' => $validatordata['name'],
-                    'email' => $validatordata['email'],
-                ]);
-            }
+            $editadmin = Adminhelper::editadmin($admin, $validatordata);
 
-
-            if (!$admin) {
-                return response()->json(['message' => 'User not found or not an admin'], 404);
-            }
-
-            return response()->json(['message' => 'User updated successfully', 'user' => $admin]);
+            return $editadmin;
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
@@ -188,24 +141,15 @@ class C_admin extends Controller
     public function destroyadmin($id)
     {
         try {
-            $admin = User::where('id', $id)
-                ->where('role', 'admin')->first();
-
-            Storage::delete('public/profile/' . $admin->photo);
-            if ($admin->delete()) {
-                return response([
-                    'Berhasil Menghapus Data'
-                ]);
-            } else {
-                //response jika gagal menghapus
-                return response([
-                    'Tidak Berhasil Menghapus Data'
-                ]);
+            try {
+                $admin = User::where('id', $id)
+                    ->where('role', 'admin')->first();
+            } catch (ModelNotFoundException $e) {
+                return response()->json("Bukan admin", 422);
             }
+            $deleteadmin = Adminhelper::deleteadmin($admin);
 
-            //delete post
-            //return response
-            // return response()->json(['message' => 'data berhasil dihapus'], 200);
+            return $deleteadmin;
         } catch (Throwable $ex) {
             // Alert::warning('Error', 'Cant deleted, Barang already used !');
             return response()->json($ex, 422);
@@ -234,59 +178,31 @@ class C_admin extends Controller
         $request->photo->move(public_path('profile'), $imageName);
         $validatordata['photo'] = $imageName;
 
+        $makementor = Adminhelper::makementor($validatordata);
 
-        $user = User::create([
-            'name'     => $validatordata['name'],
-            'email'    => $validatordata['email'],
-            'password' => bcrypt($validatordata['password']),
-            'photo'    => $validatordata['photo'],
-            'role'     => 'mentor',
-            'status'   => 'aktif'
-        ]);
-
-        if ($user) {
-            return response()->json([
-                'success' => true,
-                'user'   => $user,
-            ], 201);
-        }
-
-        return response()->json([
-            'success' => false,
-        ]);
+        return $makementor;
     }
 
 
     public function updatementor(Request $request, $id)
     {
         try {
-            $admin = User::where('id', $id)
+            $mentor = User::where('id', $id)
                 ->where('role', 'mentor')->first();
 
             $validator = Validator::make($request->all(), [
                 'name' => 'sometimes|required',
                 'email' => 'sometimes|required',
             ]);
-
             if ($validator->fails()) {
                 return response()->json($validator->errors(), 422);
             }
 
             $validatordata = $validator->validated();
 
-            if ($request->all()) {
-                $admin->update([
-                    'name' => $validatordata['name'],
-                    'email' => $validatordata['email'],
-                ]);
-            }
+            $editmentor = Adminhelper::editadmin($mentor, $validatordata);
 
-
-            if (!$admin) {
-                return response()->json(['message' => 'User not found or not an admin'], 404);
-            }
-
-            return response()->json(['message' => 'User updated successfully', 'user' => $admin]);
+            return $editmentor;
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
@@ -296,24 +212,12 @@ class C_admin extends Controller
     public function destroymentor($id)
     {
         try {
-            $admin = User::where('id', $id)
+            $mentor = User::where('id', $id)
                 ->where('role', 'mentor')->first();
 
-            Storage::delete('public/profile/' . $admin->photo);
-            if ($admin->delete()) {
-                return response([
-                    'Berhasil Menghapus Data'
-                ]);
-            } else {
-                //response jika gagal menghapus
-                return response([
-                    'Tidak Berhasil Menghapus Data'
-                ]);
-            }
+            $deletementor = Adminhelper::deleteadmin($mentor);
 
-            //delete post
-            //return response
-            // return response()->json(['message' => 'data berhasil dihapus'], 200);
+            return $deletementor;
         } catch (Throwable $ex) {
             // Alert::warning('Error', 'Cant deleted, Barang already used !');
             return response()->json($ex, 422);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Reviewhelper\ReviewHelper;
 use App\Models\review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -17,7 +18,7 @@ class C_Review extends Controller
             'review'     => 'required',
             'r_id_kelas' => 'required'
         ]);
-        // aa
+
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }

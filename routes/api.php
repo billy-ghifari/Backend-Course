@@ -25,14 +25,14 @@ use Illuminate\Support\Facades\Password;
 Route::controller(C_Auth::class)->group(function () {
     Route::post('login', 'login');
     Route::post('register', 'register');
+    Route::post('/forget-password', 'forgetPassword');
+    Route::get('/reset-password/{token}', 'resetpassword');
 });
 
 Route::middleware('auth:sanctum')->group(function () {
 
     //auth
     Route::controller(C_Auth::class)->group(function () {
-        Route::post('/forget-password', 'forgetPassword')->middleware('forStatus:aktif');
-        Route::get('/reset-password/{token}', 'resetpassword')->middleware('forStatus:aktif');
         Route::post('/reset-password', 'resetpassword')->middleware('forStatus:aktif');
         Route::post('/logout', 'logout')->middleware('forStatus:aktif');
     });
@@ -84,10 +84,10 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     //crud mentor
-    Route::controller(C_mentor::class)->group(function () {
+    Route::controller(C_admin::class)->group(function () {
         Route::post('registermentor', 'registermentor')->middleware('forStatus:aktif');
-        Route::put('/editmentor/{id}', 'updateadmin')->middleware('forStatus:aktif');
-        Route::delete('/deletementor/{id}', 'destroyadmin')->middleware('forStatus:aktif');
+        Route::put('/editmentor/{id}', 'updatementor')->middleware('forStatus:aktif');
+        Route::delete('/deletementor/{id}', 'destroymentor')->middleware('forStatus:aktif');
     });
 
     //review
