@@ -25,15 +25,14 @@ use Illuminate\Support\Facades\Password;
 Route::controller(C_Auth::class)->group(function () {
     Route::post('login', 'login');
     Route::post('register', 'register');
+    Route::post('/forget-password', 'forgetPassword');
+    Route::post('/reset-password/{token}', 'resetPassword');
 });
 
 Route::middleware('auth:sanctum')->group(function () {
 
     //auth
     Route::controller(C_Auth::class)->group(function () {
-        Route::post('/forget-password', 'forgetPassword')->middleware('forStatus:aktif');
-        Route::get('/reset-password/{token}', 'resetpassword')->middleware('forStatus:aktif');
-        Route::post('/reset-password', 'resetpassword')->middleware('forStatus:aktif');
         Route::post('/logout', 'logout')->middleware('forStatus:aktif');
     });
 
