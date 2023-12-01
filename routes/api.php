@@ -26,14 +26,13 @@ Route::controller(C_Auth::class)->group(function () {
     Route::post('login', 'login');
     Route::post('register', 'register');
     Route::post('/forget-password', 'forgetPassword');
-    Route::get('/reset-password/{token}', 'resetpassword');
+    Route::post('/reset-password/{token}', 'resetPassword');
 });
 
 Route::middleware('auth:sanctum')->group(function () {
 
     //auth
     Route::controller(C_Auth::class)->group(function () {
-        Route::post('/reset-password', 'resetpassword')->middleware('forStatus:aktif');
         Route::post('/logout', 'logout')->middleware('forStatus:aktif');
     });
 
