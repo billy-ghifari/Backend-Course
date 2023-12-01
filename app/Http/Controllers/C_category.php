@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Validator;
 
 class C_category extends Controller
 {
+    //-------------------- Create Category --------------------//
+
     public function create(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -27,6 +29,12 @@ class C_category extends Controller
 
         return response()->json(['message' => 'Data berhasil ditambahkan', 'data' => $category], 200);
     }
+
+    //-------------------- Create Category --------------------//
+
+
+
+    //-------------------- Update Category --------------------//
 
     public function update(Request $request, $id)
     {
@@ -48,6 +56,12 @@ class C_category extends Controller
         return $response;
     }
 
+    //-------------------- Create Category --------------------//
+
+
+
+    //-------------------- Delete Category --------------------//
+
     public function destroy($id)
     {
         try {
@@ -57,4 +71,6 @@ class C_category extends Controller
         }
         return CategoryHelper::destroy($category);
     }
+
+    //-------------------- Delete Category --------------------//
 }

@@ -8,6 +8,8 @@ use App\Helpers\Authhelper\AuthHelper;
 
 class C_Auth extends Controller
 {
+    //-------------------- Login --------------------//
+
     public function login(Request $request)
     {
         try {
@@ -30,6 +32,12 @@ class C_Auth extends Controller
             ]);
         }
     }
+
+    //-------------------- Login --------------------//
+
+
+
+    //-------------------- Register --------------------//
 
     public function register(Request $request)
     {
@@ -59,6 +67,12 @@ class C_Auth extends Controller
         ]);
     }
 
+    //-------------------- Register --------------------//
+
+
+
+    //-------------------- Forgot Password --------------------//
+
     public function forgetPassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -76,6 +90,12 @@ class C_Auth extends Controller
         return response()->json($resetLink);
     }
 
+    //-------------------- Forgot Password --------------------//
+
+
+
+    //-------------------- Reset Password --------------------//
+
     public function resetPassword(Request $request, $token)
     {
         $request->validate([
@@ -87,4 +107,6 @@ class C_Auth extends Controller
 
         return $response;
     }
+
+    //-------------------- Reset Password --------------------//
 }

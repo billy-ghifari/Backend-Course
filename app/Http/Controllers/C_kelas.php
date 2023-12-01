@@ -10,15 +10,20 @@ use Throwable;
 
 class C_kelas extends Controller
 {
-    //show kelas
+    //-------------------- Read Kelas --------------------//
+
     public function index()
     {
         $kelas = kelas::latest()->paginate(2);
         return response()->json(['message' => 'List data review', 'data' => $kelas]);
     }
-    //show kelas
 
-    //create kelas
+    //-------------------- Read Kelas --------------------//
+
+
+
+    //-------------------- Create Kelas --------------------//
+
     public function post_kelas(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -47,9 +52,13 @@ class C_kelas extends Controller
 
         return response()->json(['message' => 'data berhasil ditambahkan', 'data' => $post], 200);
     }
-    //create kelas
 
-    //update kelas
+    //-------------------- Create Kelas --------------------//
+
+
+
+    //-------------------- Update Kelas --------------------//
+
     public function update(Request $request, $id)
     {
         $post = kelas::findOrFail($id);
@@ -74,9 +83,13 @@ class C_kelas extends Controller
 
         return response()->json(['message' => 'data berhasil diubah', 'data' => $post], 200);
     }
-    //update kelas
 
-    //deleted kelas
+    //-------------------- Update Kelas --------------------//
+
+
+
+    //-------------------- Delete Kelas --------------------//
+
     public function destroy($id)
     {
         try {
@@ -88,19 +101,14 @@ class C_kelas extends Controller
                     'Berhasil Menghapus Data'
                 ]);
             } else {
-                //response jika gagal menghapus
                 return response([
                     'Tidak Berhasil Menghapus Data'
                 ]);
             }
-
-            //delete post
-            //return response
-            // return response()->json(['message' => 'data berhasil dihapus'], 200);
         } catch (Throwable $ex) {
-            // Alert::warning('Error', 'Cant deleted, Barang already used !');
             return response()->json($ex, 422);
         }
     }
-    //deleted kelas
+
+    //-------------------- Delete Kelas --------------------//
 }

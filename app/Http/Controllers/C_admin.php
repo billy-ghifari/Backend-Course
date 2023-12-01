@@ -9,12 +9,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 use Throwable;
 
 class C_admin extends Controller
 {
-    //siswa pengaktifan
+
+    //-------------------- Aktivasi Siswa --------------------//
 
     public function index()
     {
@@ -61,9 +61,13 @@ class C_admin extends Controller
             return response()->json(['message' => 'Gagal aktivasi ' . $e->getMessage()], 500);
         }
     }
-    //siswa pengaktifan
 
-    //kelas pengaktifan
+    //-------------------- Aktivasi Siswa --------------------//
+
+
+
+    //-------------------- Aktivasi Kelas --------------------//
+
     public function activationkelas($id)
     {
         try {
@@ -78,9 +82,12 @@ class C_admin extends Controller
             return response()->json(['message' => 'Gagal aktivasi ' . $e->getMessage()], 500);
         }
     }
-    //kelas pengaktifan
 
-    //crud admin
+    //-------------------- Aktivasi Kelas --------------------//
+
+
+
+    //-------------------- CRUD Admin --------------------//
     public function loginadmin(Request $request)
     {
         $login = Auth::attempt($request->all());
@@ -211,12 +218,14 @@ class C_admin extends Controller
             return response()->json($ex, 422);
         }
     }
-    //crud admin
 
-    //crud admin
+    //-------------------- CRUD Admin --------------------//
+
+
+
+    //-------------------- CRUD Mentor --------------------//
     public function registermentor(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'name'     => 'required',
             'email'    => 'required|email|unique:users',
@@ -233,7 +242,6 @@ class C_admin extends Controller
         $imageName = time() . '.' . $validatordata['photo']->extension();
         $request->photo->move(public_path('profile'), $imageName);
         $validatordata['photo'] = $imageName;
-
 
         $user = User::create([
             'name'     => $validatordata['name'],
@@ -255,7 +263,6 @@ class C_admin extends Controller
             'success' => false,
         ]);
     }
-
 
     public function updatementor(Request $request, $id)
     {
@@ -281,7 +288,6 @@ class C_admin extends Controller
                 ]);
             }
 
-
             if (!$admin) {
                 return response()->json(['message' => 'User not found or not an admin'], 404);
             }
@@ -291,7 +297,6 @@ class C_admin extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-
 
     public function destroymentor($id)
     {
@@ -305,19 +310,14 @@ class C_admin extends Controller
                     'Berhasil Menghapus Data'
                 ]);
             } else {
-                //response jika gagal menghapus
                 return response([
                     'Tidak Berhasil Menghapus Data'
                 ]);
             }
-
-            //delete post
-            //return response
-            // return response()->json(['message' => 'data berhasil dihapus'], 200);
         } catch (Throwable $ex) {
-            // Alert::warning('Error', 'Cant deleted, Barang already used !');
             return response()->json($ex, 422);
         }
     }
-    //crud admin
+
+    //-------------------- CRUD Mentor --------------------//
 }

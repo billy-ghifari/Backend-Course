@@ -9,7 +9,8 @@ use Throwable;
 
 class C_materi extends Controller
 {
-    //create materi
+    //-------------------- Create Materi --------------------//
+
     public function post_materi(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -35,9 +36,13 @@ class C_materi extends Controller
 
         return response()->json(['message' => 'data berhasil ditambahkan', 'data' => $post], 200);
     }
-    //create materi
 
-    //update materi
+    //--------------------Create Materi --------------------//
+
+
+
+    //-------------------- Update Materi --------------------//
+
     public function update(Request $request, $id)
     {
         $post = materi::findOrFail($id);
@@ -68,9 +73,13 @@ class C_materi extends Controller
 
         return response()->json(['message' => 'data berhasil diubah', 'data' => $post], 200);
     }
-    //update materi
 
-    //deleted materi
+    //-------------------- Update Materi --------------------//
+
+
+
+    //-------------------- Delete Materi --------------------//
+
     public function destroy($id)
     {
         try {
@@ -81,19 +90,14 @@ class C_materi extends Controller
                     'Berhasil Menghapus Data'
                 ]);
             } else {
-                //response jika gagal menghapus
                 return response([
                     'Tidak Berhasil Menghapus Data'
                 ]);
             }
-
-            //delete post
-            //return response
-            // return response()->json(['message' => 'data berhasil dihapus'], 200);
         } catch (Throwable $ex) {
-            // Alert::warning('Error', 'Cant deleted, Barang already used !');
             return response()->json($ex, 422);
         }
     }
-    //deleted materi
+
+    //-------------------- Delete Materi --------------------//
 }

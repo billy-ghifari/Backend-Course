@@ -4,6 +4,7 @@ namespace App\Helpers\Authhelper;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +12,6 @@ use Illuminate\Support\Facades\Validator;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use illuminate\Support\Str;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use PHPMailer\PHPMailer\Exception;
 
@@ -19,7 +19,7 @@ class AuthHelper
 {
     public static function login(Request $request)
     {
-        // aa
+
         if (Auth::attempt($request->only('email', 'password'))) {
             $user = Auth::user();
             $token = $request->user()->createToken('myAppToken')->plainTextToken;
@@ -118,7 +118,7 @@ class AuthHelper
             DB::table('password_reset_tokens')->insert([
                 'email' => $validatordata['email'],
                 'token' => $token,
-                'created_at' => Carbon::now(),
+                'created_at' => Carbon::now()
             ]);
 
             $mail->isHTML(true);

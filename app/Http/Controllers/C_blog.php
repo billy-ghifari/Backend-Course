@@ -10,15 +10,20 @@ use Throwable;
 
 class C_blog extends Controller
 {
-    //read blog
+    //-------------------- Read Blog --------------------//
+
     public function index()
     {
         $blogs = blog::latest()->paginate(5);
         return response()->json(['message' => 'List data review', 'data' => $blogs]);
     }
-    //read blog
 
-    //create blog
+    //-------------------- Read Blog --------------------//
+
+
+
+    //-------------------- Create Blog --------------------//
+
     public function post_blog(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -49,9 +54,13 @@ class C_blog extends Controller
 
         return response()->json(['message' => 'data berhasil ditambahkan', 'data' => $post], 200);
     }
-    //create blog
 
-    //update blog
+    //-------------------- Create Blog --------------------//
+
+
+
+    //-------------------- Update Blog --------------------//
+
     public function update(Request $request, blog $blog, $id)
     {
         $post = blog::findOrFail($id);
@@ -78,9 +87,13 @@ class C_blog extends Controller
 
         return response()->json(['message' => 'data berhasil diubah', 'data' => $post], 200);
     }
-    //update blog
 
-    //deleted blog
+    //-------------------- Update Blog --------------------//
+
+
+
+    //-------------------- Delete Blog --------------------//
+
     public function destroy($id)
     {
         try {
@@ -92,19 +105,14 @@ class C_blog extends Controller
                     'Berhasil Menghapus Data'
                 ]);
             } else {
-                //response jika gagal menghapus
                 return response([
                     'Tidak Berhasil Menghapus Data'
                 ]);
             }
-
-            //delete post
-            //return response
-            // return response()->json(['message' => 'data berhasil dihapus'], 200);
         } catch (Throwable $ex) {
-            // Alert::warning('Error', 'Cant deleted, Barang already used !');
             return response()->json($ex, 422);
         }
     }
-    //deleted blog
+
+    //-------------------- Delete Blog --------------------//
 }
