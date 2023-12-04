@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Bloghelper;
 use App\Models\blog;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
 
@@ -14,8 +15,11 @@ class C_blog extends Controller
 
     public function index()
     {
-        $blogs = blog::latest()->paginate(5);
-        return response()->json(['message' => 'List data review', 'data' => $blogs]);
+        // Memanggil fungsi pagination dari Bloghelper untuk mengambil data blog dengan paginasi
+        $pagination = Bloghelper::pagination();
+
+        // Mengembalikan data yang telah dipaginasi
+        return $pagination;
     }
 
     //-------------------- Read Blog --------------------//
@@ -26,33 +30,41 @@ class C_blog extends Controller
 
     public function post_blog(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'judul' => 'required',
-            'r_id_category' => 'required',
-            'content' => 'required',
-            'foto_thumbnail' => 'required',
-            'r_id_non_siswa' => 'required'
-        ]);
+        try {
+            // Validasi input menggunakan Validator
+            $validator = Validator::make($request->all(), [
+                'judul' => 'required',
+                'r_id_category' => 'required',
+                'content' => 'required',
+                'foto_thumbnail' => 'required|image', // Memastikan foto_thumbnail adalah file gambar
+                'r_id_non_siswa' => 'required'
+            ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            // Jika validasi gagal, kembalikan pesan error 422
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 422);
+            }
+
+            // Mendapatkan data yang telah divalidasi
+            $validatordata = $validator->validated();
+
+            // Mengelola gambar foto_thumbnail: memindahkan gambar ke lokasi yang ditentukan
+            $imageName = time() . '.' . $validatordata['foto_thumbnail']->extension();
+            $request->foto_thumbnail->move(public_path('blog'), $imageName);
+            $validatordata['foto_thumbnail'] = $imageName;
+
+            // Memanggil fungsi makeblog dari Bloghelper untuk membuat blog baru
+            $makeblog = Bloghelper::makeblog($validatordata);
+
+            // Mengembalikan respons dari fungsi makeblog
+            return $makeblog;
+        } catch (\Exception $e) {
+            // Tangani jika terjadi error dalam proses pembuatan blog
+            return response()->json([
+                'response_code' =>  404,
+                'message'       =>   $e,
+            ]);
         }
-
-        $validatordata = $validator->validated();
-
-        $imageName = time() . '.' . $validatordata['foto_thumbnail']->extension();
-        $request->foto_thumbnail->move(public_path('blog'), $imageName);
-        $validatordata['foto_thumbnail'] = $imageName;
-
-        $post = blog::create([
-            'judul' => $validatordata['judul'],
-            'r_id_category' => $validatordata['r_id_category'],
-            'content' => $validatordata['content'],
-            'foto_thumbnail' => $validatordata['foto_thumbnail'],
-            'r_id_non_siswa' => $validatordata['r_id_non_siswa']
-        ]);
-
-        return response()->json(['message' => 'data berhasil ditambahkan', 'data' => $post], 200);
     }
 
     //-------------------- Create Blog --------------------//
@@ -63,29 +75,33 @@ class C_blog extends Controller
 
     public function update(Request $request, blog $blog, $id)
     {
-        $post = blog::findOrFail($id);
+        try {
+            // Mencari blog dengan ID yang diberikan
+            $blog = blog::findOrFail($id);
+        } catch (ModelNotFoundException $e) {
+            // Menangani jika tidak dapat menemukan blog dengan ID yang diberikan
+            return response()->json("Tidak dapat menemukan blog", 422);
+        }
 
+        // Melakukan validasi terhadap input yang diberikan
         $validator = Validator::make($request->all(), [
             'judul' => 'required',
             'r_id_category' => 'required',
             'content' => 'required',
         ]);
 
+        // Jika validasi gagal, kembalikan pesan error 422
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
+        // Mendapatkan data yang telah divalidasi
         $validatordata = $validator->validated();
 
-        if ($request->all()) {
-            $post->update([
-                'judul' => $validatordata['judul'],
-                'r_id_category' => $validatordata['r_id_category'],
-                'content' => $validatordata['content'],
-            ]);
-        }
+        // Memanggil fungsi updateblog dari Bloghelper untuk memperbarui blog
+        $updateblog = Bloghelper::updateblog($validatordata, $blog);
 
-        return response()->json(['message' => 'data berhasil diubah', 'data' => $post], 200);
+        return $updateblog;
     }
 
     //-------------------- Update Blog --------------------//
@@ -97,20 +113,21 @@ class C_blog extends Controller
     public function destroy($id)
     {
         try {
-            $blog = blog::findOrFail($id);
-
-            Storage::delete('public/profile/' . $blog->foto_thumbnail);
-            if ($blog->delete()) {
-                return response([
-                    'Berhasil Menghapus Data'
-                ]);
-            } else {
-                return response([
-                    'Tidak Berhasil Menghapus Data'
-                ]);
+            // Mencari blog dengan ID yang diberikan
+            try {
+                $blog = blog::findOrFail($id);
+            } catch (ModelNotFoundException $e) {
+                // Menangani jika tidak dapat menemukan blog dengan ID yang diberikan
+                return response()->json("Tidak dapat menemukan blog", 422);
             }
+
+            // Memanggil fungsi deleteblog dari Bloghelper untuk menghapus blog
+            $deleteblog = Bloghelper::deleteblog($blog);
+
+            return $deleteblog;
         } catch (Throwable $ex) {
-            return response()->json($ex, 422);
+            // Menangani kesalahan jika terjadi error selama penghapusan
+            return response()->json(['message' => 'tidak dapat menghapus blog']);
         }
     }
 

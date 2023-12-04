@@ -25,7 +25,9 @@ class checkRole
             }
         }
         return response()->json([
-            'message' => $roles,
+            'message' => 'Anda tidak dapat mengakses fitur ini',
+            'warning' => 'Yang dapat mengakses',
+            'role' => $roles
         ], 403);
     }
 }

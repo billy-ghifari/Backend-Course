@@ -8,37 +8,42 @@ use Illuminate\Support\Facades\Validator;
 
 class ReviewHelper
 {
-    public static function review(Request $request)
+
+    //-------------------- Create Review --------------------//
+
+    public static function review($validatedData)
     {
-        $validator = Validator::make($request->all(), [
-            'r_id_siswa'  => 'required',
-            'review'     => 'required',
-            'r_id_kelas' => 'required',
-            'rating'     => 'required|numeric|min:1|max:5'
+        // Membuat entri baru dalam tabel review berdasarkan data yang telah divalidasi
+        $post = Review::create([
+            'r_id_siswa'  => $validatedData['r_id_siswa'],
+            'review'      => $validatedData['review'],
+            'r_id_kelas'  => $validatedData['r_id_kelas'],
+            'rating'      => $validatedData['rating']
         ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-        $validatorreview = $validator->validated();
-        $post = review::create([
-            'r_id_siswa'  => $validatorreview['r_id_siswa'],
-            'review'     => $validatorreview['review'],
-            'r_id_kelas' => $validatorreview['r_id_kelas'],
-            'rating'     => $validatorreview['rating']
-        ]);
+        // Mengembalikan respons JSON yang menyatakan bahwa data review berhasil ditambahkan, serta data review yang baru saja ditambahkan ke database
         return response()->json(['message' => 'data review berhasil ditambahkan', 'data' => $post], 200);
     }
 
-    public static function deleteReview($id)
+    //-------------------- Create Review --------------------//
+
+
+
+    //-------------------- Delete Review --------------------//
+
+    public static function deleteReview(Review $review)
     {
         try {
-            $deleted = Review::findOrFail($id);
-            $deleted->delete();
+            //Proses menghapus data yang direpresentasikan oleh variabel $review
+            $review->delete();
+
+            //Mengembalikan respons dalam bentuk JSON dengan pesan 'Review Berhasil Dihapus!' dan status kode 200 jika penghapusan berhasil dilakukan
             return response()->json(['message' => 'Review Berhasil Dihapus!'], 200);
         } catch (\Throwable $ex) {
+            //Respons yang dikirim jika terjadi kesalahan. Ini akan mengembalikan informasi kesalahan dalam bentuk JSON
             return response()->json($ex, 200);
         }
     }
+
+    //-------------------- Delete Review --------------------//
 }

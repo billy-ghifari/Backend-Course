@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Materihelper;
 use App\Models\materi;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
@@ -13,6 +15,7 @@ class C_materi extends Controller
 
     public function post_materi(Request $request)
     {
+        // Validasi data yang diterima dari request menggunakan Validator
         $validator = Validator::make($request->all(), [
             'r_id_kelas' => 'required',
             'judul_materi' => 'required',
@@ -21,21 +24,22 @@ class C_materi extends Controller
             'durasi' => 'required',
         ]);
 
+        // Memeriksa apakah validasi gagal
         if ($validator->fails()) {
+            // Jika validasi gagal, kembalikan respons berupa pesan error yang menjelaskan detail kesalahan validasi
             return response()->json($validator->errors(), 422);
         }
 
+        // Jika data yang diterima lolos dari proses validasi, data tersebut akan disimpan dalam variabel $validatordata
         $validatordata = $validator->validated();
-        $post = materi::create([
-            'r_id_kelas' => $validatordata['r_id_kelas'],
-            'judul_materi' => $validatordata['judul_materi'],
-            'link_materi' => $validatordata['link_materi'],
-            'deskripsi_materi' => $validatordata['deskripsi_materi'],
-            'durasi' => $validatordata['durasi'],
-        ]);
 
-        return response()->json(['message' => 'data berhasil ditambahkan', 'data' => $post], 200);
+        // Menggunakan Materihelper::makemateri() untuk membuat entri baru dalam database yang berisi informasi tentang materi yang ditambahkan
+        $makemateri = Materihelper::makemateri($validatordata);
+
+        // Respons dari proses ini akan mengembalikan hasil dari fungsi Materihelper::makemateri(), yang kemudian akan digunakan sebagai respons dari fungsi post_materi()
+        return $makemateri;
     }
+
 
     //--------------------Create Materi --------------------//
 
@@ -45,8 +49,15 @@ class C_materi extends Controller
 
     public function update(Request $request, $id)
     {
-        $post = materi::findOrFail($id);
+        try {
+            // Mencari materi berdasarkan ID yang diberikan
+            $materi = materi::findOrFail($id);
+        } catch (ModelNotFoundException $e) {
+            // Jika materi tidak ditemukan, kembalikan respons berupa pesan error
+            return response()->json("Tidak dapat menemukan materi", 422);
+        }
 
+        // Validasi data yang diterima dari request menggunakan Validator
         $validator = Validator::make($request->all(), [
             'r_id_kelas' => 'required',
             'judul_materi' => 'required',
@@ -55,23 +66,20 @@ class C_materi extends Controller
             'durasi' => 'required',
         ]);
 
+        // Memeriksa apakah validasi gagal
         if ($validator->fails()) {
+            // Jika validasi gagal, kembalikan respons berupa pesan error yang menjelaskan detail kesalahan validasi
             return response()->json($validator->errors(), 422);
         }
 
+        // Jika data yang diterima lolos dari proses validasi, data tersebut akan disimpan dalam variabel $validatordata
         $validatordata = $validator->validated();
 
-        if ($request->all()) {
-            $post->update([
-                'r_id_kelas' => $validatordata['r_id_kelas'],
-                'judul_materi' => $validatordata['judul_materi'],
-                'link_materi' => $validatordata['link_materi'],
-                'deskripsi_materi' => $validatordata['deskripsi_materi'],
-                'durasi' => $validatordata['durasi'],
-            ]);
-        }
+        // Menggunakan Materihelper::updatemateri() untuk memperbarui informasi materi yang ada berdasarkan data yang diterima dari request
+        $updatemateri = Materihelper::updatemateri($materi, $validatordata);
 
-        return response()->json(['message' => 'data berhasil diubah', 'data' => $post], 200);
+        // Respons dari proses ini akan mengembalikan hasil dari fungsi Materihelper::updatemateri(), yang kemudian akan digunakan sebagai respons dari fungsi update()
+        return $updatemateri;
     }
 
     //-------------------- Update Materi --------------------//
@@ -83,18 +91,21 @@ class C_materi extends Controller
     public function destroy($id)
     {
         try {
-            $kelas = materi::findOrFail($id);
-
-            if ($kelas->delete()) {
-                return response([
-                    'Berhasil Menghapus Data'
-                ]);
-            } else {
-                return response([
-                    'Tidak Berhasil Menghapus Data'
-                ]);
+            try {
+                // Mencari materi berdasarkan ID yang diberikan
+                $materi = materi::findOrFail($id);
+            } catch (ModelNotFoundException $e) {
+                // Jika materi tidak ditemukan, kembalikan respons berupa pesan error
+                return response()->json("Tidak dapat menemukan materi", 422);
             }
+
+            // Menggunakan Materihelper::deletemateri() untuk menghapus materi yang ditemukan
+            $deletemateri = Materihelper::deletemateri($materi);
+
+            // Respons dari proses ini akan mengembalikan hasil dari fungsi Materihelper::deletemateri()
+            return $deletemateri;
         } catch (Throwable $ex) {
+            // Jika terjadi kesalahan yang tidak terduga, tangkap dan kembalikan respons berupa pesan error
             return response()->json($ex, 422);
         }
     }

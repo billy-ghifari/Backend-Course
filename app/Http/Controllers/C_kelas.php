@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Kelashelper;
 use App\Models\kelas;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
 
@@ -14,8 +15,11 @@ class C_kelas extends Controller
 
     public function index()
     {
-        $kelas = kelas::latest()->paginate(2);
-        return response()->json(['message' => 'List data review', 'data' => $kelas]);
+        // Mengambil data kelas dengan paginasi menggunakan Kelashelper::paginate()
+        $pagination = Kelashelper::paginate();
+
+        // Mengembalikan data paginasi sebagai respons
+        return $pagination;
     }
 
     //-------------------- Read Kelas --------------------//
@@ -26,31 +30,32 @@ class C_kelas extends Controller
 
     public function post_kelas(Request $request)
     {
+        // Validasi data yang diterima dari request
         $validator = Validator::make($request->all(), [
-            'nama' => 'required',
-            'deskripsi' => 'required',
+            'nama'           => 'required',
+            'deskripsi'      => 'required',
             'foto_thumbnail' => 'required',
             'r_id_non_siswa' => 'required',
         ]);
 
+        // Jika validasi gagal, kembalikan pesan error
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
+        // Ambil data yang telah divalidasi
         $validatordata = $validator->validated();
 
+        // Pindahkan foto thumbnail ke lokasi yang ditentukan dan ubah nama file
         $imageName = time() . '.' . $validatordata['foto_thumbnail']->extension();
         $request->foto_thumbnail->move(public_path('kelas'), $imageName);
         $validatordata['foto_thumbnail'] = $imageName;
 
-        $post = kelas::create([
-            'nama' => $validatordata['nama'],
-            'deskripsi' => $validatordata['deskripsi'],
-            'foto_thumbnail' => $validatordata['foto_thumbnail'],
-            'r_id_non_siswa' => $validatordata['r_id_non_siswa'],
-        ]);
+        // Buat kelas baru menggunakan Kelashelper::makekelas()
+        $makekelas = Kelashelper::makekelas($validatordata);
 
-        return response()->json(['message' => 'data berhasil ditambahkan', 'data' => $post], 200);
+        // Kembalikan hasil operasi membuat kelas
+        return $makekelas;
     }
 
     //-------------------- Create Kelas --------------------//
@@ -61,27 +66,33 @@ class C_kelas extends Controller
 
     public function update(Request $request, $id)
     {
-        $post = kelas::findOrFail($id);
+        try {
+            // Mengambil data kelas berdasarkan ID
+            $kelas = Kelas::findOrFail($id);
+        } catch (ModelNotFoundException $e) {
+            // Mengembalikan respons jika kelas tidak ditemukan
+            return response()->json("Tidak dapat menemukan kelas", 422);
+        }
 
+        // Validasi data yang diterima dari request
         $validator = Validator::make($request->all(), [
             'nama' => 'required',
             'deskripsi' => 'required',
         ]);
 
+        // Jika validasi gagal, kembalikan pesan error
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
+        // Ambil data yang telah divalidasi
         $validatordata = $validator->validated();
 
-        if ($request->all()) {
-            $post->update([
-                'nama' => $validatordata['nama'],
-                'deskripsi' => $validatordata['deskripsi'],
-            ]);
-        }
+        // Panggil Kelashelper::updatekelas() untuk melakukan update data kelas
+        $updatekelas = Kelashelper::updatekelas($kelas, $validatordata);
 
-        return response()->json(['message' => 'data berhasil diubah', 'data' => $post], 200);
+        // Kembalikan hasil operasi update kelas
+        return $updatekelas;
     }
 
     //-------------------- Update Kelas --------------------//
@@ -93,19 +104,21 @@ class C_kelas extends Controller
     public function destroy($id)
     {
         try {
-            $kelas = kelas::findOrFail($id);
-
-            Storage::delete('public/profile/' . $kelas->foto_thumbnail);
-            if ($kelas->delete()) {
-                return response([
-                    'Berhasil Menghapus Data'
-                ]);
-            } else {
-                return response([
-                    'Tidak Berhasil Menghapus Data'
-                ]);
+            try {
+                // Mencoba mencari data kelas berdasarkan ID
+                $kelas = Kelas::findOrFail($id);
+            } catch (ModelNotFoundException $e) {
+                // Jika kelas tidak ditemukan, respons dengan pesan kesalahan
+                return response()->json("Tidak dapat menemukan kelas", 422);
             }
+
+            // Memanggil Kelashelper::deletekelas() untuk menghapus kelas
+            $deletekelas = Kelashelper::deletekelas($kelas);
+
+            // Mengembalikan respons dari hasil operasi penghapusan kelas
+            return $deletekelas;
         } catch (Throwable $ex) {
+            // Menangani exception yang mungkin terjadi selama proses penghapusan
             return response()->json($ex, 422);
         }
     }
