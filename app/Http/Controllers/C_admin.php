@@ -15,7 +15,7 @@ use Throwable;
 
 class C_admin extends Controller
 {
-    // Controller Admin 
+    // Controller Admin Bismillah
     //-------------------- Aktivasi Siswa --------------------//
 
     public function index()
