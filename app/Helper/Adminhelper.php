@@ -29,6 +29,36 @@ class Adminhelper
         return response()->json($siswa);
     }
 
+    public static function siswa_on()
+    {
+        // Mengambil informasi user yang sedang terautentikasi (login)
+        $user = Auth::user();
+
+        // Memeriksa apakah pengguna terautentikasi
+        if (!$user) {
+            // Jika tidak terautentikasi, kembalikan respon JSON dengan pesan 'tidak ada siswa' dan status 401 (Unauthorized)
+            return response()->json(['message' => 'tidak ada siswa'], 401);
+        }
+
+        // Mengambil semua data pengguna yang memiliki peran (status) 'siswa'
+        $siswaCount = User::where('status', 'aktif')
+            ->where('role', 'siswa')
+            ->count();
+
+
+        // Mengembalikan respon JSON yang berisi data siswa
+        return response()->json($siswaCount);
+    }
+
+    public static function get_siswa()
+    {
+        $siswa = User::where('role', 'siswa')
+            ->latets()
+            ->paginate(10);
+
+        return $siswa;
+    }
+
     public static function activation($siswa)
     {
         // Memperbarui status akun siswa menjadi 'aktif'
@@ -55,7 +85,21 @@ class Adminhelper
 
 
 
-    //-------------------- Aktivasi Admin --------------------//
+    //-------------------- CRUD Admin --------------------//
+    public static function alladmin()
+    {
+        // Mengambil semua data pengguna yang memiliki peran (role) 'siswa'
+        $admin = User::where('role', 'admin')->get();
+
+        // Memeriksa apakah pengguna terautentikasi
+        if (!$admin) {
+            // Jika tidak terautentikasi, kembalikan respon JSON dengan pesan 'tidak ada siswa' dan status 401 (Unauthorized)
+            return response()->json(['message' => 'tidak ada admin'], 401);
+        }
+
+        // Mengembalikan respon JSON yang berisi data siswa
+        return response()->json($admin);
+    }
 
     public static function makeadmin($validatordata)
     {
@@ -127,11 +171,59 @@ class Adminhelper
         return response()->json(['message' => 'data berhasil dihapus'], 200);
     }
 
-    //-------------------- Aktivasi Admin --------------------//
+    public static function get_profile($id)
+    {
+        // Mengambil semua data pengguna yang memiliki peran (status) 'siswa'
+        $profile = User::findOrFail($id);
+
+        // Memeriksa apakah pengguna terautentikasi
+        if (!$profile) {
+            // Jika tidak terautentikasi, kembalikan respon JSON dengan pesan 'tidak ada siswa' dan status 401 (Unauthorized)
+            return response()->json(['message' => 'tidak ada siswa'], 401);
+        }
+
+        // Mengembalikan respon JSON yang berisi data siswa
+        return response()->json($profile);
+    }
+
+    public static function getiduser($uuid)
+    {
+        // Mengambil semua data pengguna yang memiliki peran (status) 'siswa'
+        $profile = User::where('uuid', $uuid)->value('id');
+
+        // Memeriksa apakah pengguna terautentikasi
+        if (!$profile) {
+            // Jika tidak terautentikasi, kembalikan respon JSON dengan pesan 'tidak ada siswa' dan status 401 (Unauthorized)
+            return response()->json(['message' => 'tidak ada siswa'], 401);
+        }
+
+        // Mengembalikan respon JSON yang berisi data siswa
+        return response()->json($profile);
+    }
+
+    //-------------------- CRUD Admin --------------------//
 
 
 
     //-------------------- Aktivasi Mentor --------------------//
+
+
+    public static function allmentor()
+    {
+        // Mengambil semua data pengguna yang memiliki peran (role) 'siswa'
+        $admin = User::where('role', 'mentor')
+            ->latest()
+            ->paginate(8);
+
+        // Memeriksa apakah pengguna terautentikasi
+        if (!$admin) {
+            // Jika tidak terautentikasi, kembalikan respon JSON dengan pesan 'tidak ada siswa' dan status 401 (Unauthorized)
+            return response()->json(['message' => 'tidak ada admin'], 401);
+        }
+
+        // Mengembalikan respon JSON yang berisi data siswa
+        return response()->json($admin);
+    }
 
     public static function makementor($validatordata)
     {

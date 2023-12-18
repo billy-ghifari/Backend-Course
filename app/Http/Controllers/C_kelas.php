@@ -22,6 +22,66 @@ class C_kelas extends Controller
         return $pagination;
     }
 
+    public function getall_course()
+    {
+        // Mengambil data kelas dengan paginasi menggunakan Kelashelper::paginateall()
+        $paginateall = Kelashelper::paginateall();
+
+        // Mengembalikan data paginasi sebagai respons
+        return $paginateall;
+    }
+
+    public function getone_kelas()
+    {
+        // Mengambil data kelas dengan paginasi menggunakan Kelashelper::paginatekelas()
+        $paginatekelas = KelasHelper::paginatekelas();
+
+        // Mengembalikan data paginasi sebagai respons
+        return $paginatekelas;
+    }
+
+    public function get_kelas()
+    {
+        try {
+            $kelas = Kelashelper::get_kelas(); // Panggil helper untuk mendapatkan semua data blog
+
+            return response()->json([
+                'status' => true,
+                'data' => $kelas
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to fetch blogs.'
+            ], 500);
+        }
+    }
+
+    public function getallkelas()
+    {
+        try {
+            // Memanggil method dari Adminhelper untuk mendapatkan semua siswa
+            $allkelas = Kelashelper::getallkelas();
+
+            return $allkelas; // Mengembalikan daftar semua siswa
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getClassById($id)
+    {
+        try {
+            $class = Kelashelper::getClassById($id); // Memanggil helper untuk mengambil data kelas berdasarkan ID
+
+            return response()->json(['classData' => $class], 200);
+        } catch (ModelNotFoundException $ex) {
+            return response()->json(['message' => 'Kelas tidak ditemukan'], 404);
+        } catch (\Exception $ex) {
+            return response()->json(['message' => $ex->getMessage()], 422);
+        }
+    }
+
     //-------------------- Read Kelas --------------------//
 
 
@@ -36,6 +96,7 @@ class C_kelas extends Controller
             'deskripsi'      => 'required',
             'foto_thumbnail' => 'required',
             'r_id_non_siswa' => 'required',
+            'r_id_category'  => 'required'
         ]);
 
         // Jika validasi gagal, kembalikan pesan error
@@ -48,7 +109,10 @@ class C_kelas extends Controller
 
         // Pindahkan foto thumbnail ke lokasi yang ditentukan dan ubah nama file
         $imageName = time() . '.' . $validatordata['foto_thumbnail']->extension();
-        $request->foto_thumbnail->move(public_path('kelas'), $imageName);
+        $request->foto_thumbnail->move(
+            public_path('kelas'),
+            $imageName
+        );
         $validatordata['foto_thumbnail'] = $imageName;
 
         // Buat kelas baru menggunakan Kelashelper::makekelas()

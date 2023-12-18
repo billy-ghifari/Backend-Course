@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('r_id_materi');
             $table->string('foto_thumbnail');
             $table->integer('r_id_non_siswa');
+            $table->integer('r_id_foto_non_siswa');
             $table->timestamps();
         });
     }

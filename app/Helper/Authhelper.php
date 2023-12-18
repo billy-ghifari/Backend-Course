@@ -50,6 +50,52 @@ class AuthHelper
         }
     }
 
+    public static function loginadmin(Request $request)
+    {
+        // Melakukan percobaan otentikasi dengan menggunakan email dan password yang diterima dari request
+        if (Auth::attempt($request->only('email', 'password'))) {
+            // Jika otentikasi berhasil, mengambil informasi pengguna yang terotentikasi
+            $user = Auth::user();
+
+            // Mengecek peran pengguna
+            $role = $user->role; // Misalnya, kolom 'role' pada model User
+
+            // Memeriksa peran pengguna dan memberikan token sesuai perannya
+            switch ($role) {
+                case 'superadmin':
+                    $token = $request->user()->createToken('superadminToken')->plainTextToken;
+                    break;
+                case 'admin':
+                    $token = $request->user()->createToken('adminToken')->plainTextToken;
+                    break;
+                case 'mentor':
+                    $token = $request->user()->createToken('mentorToken')->plainTextToken;
+                    break;
+            }
+
+            // Mengembalikan respons JSON yang berisi status login berhasil, informasi pengguna, dan token yang dienkripsi
+            return [
+                'status' => true,
+                'data' => [
+                    'status' => true,
+                    'user' => $user,
+                    'role' => $role, // Menambahkan informasi peran ke respons
+                    'token' => Crypt::encrypt($token)
+                ]
+            ];
+        } else {
+            // Jika otentikasi gagal, mengembalikan respons JSON yang berisi status login gagal dan pesan kesalahan
+            return [
+                'status' => false,
+                'data' => [
+                    'status' => false,
+                    'message' => "Email atau password Anda salah"
+                ],
+            ];
+        }
+    }
+
+
     //-------------------- Login --------------------//
 
 
@@ -58,19 +104,28 @@ class AuthHelper
 
     public static function register($validatordata)
     {
+        $lastid = User::latest()->value('id');
+        $nextid = $lastid + 1;
+        $encryptuuid = Crypt::encrypt($nextid);
+
         // Membuat entri baru dalam tabel User dengan menggunakan data yang telah divalidasi
         $user = User::create([
             'name'     => $validatordata['name'],
             'email'    => $validatordata['email'],
             'password' => bcrypt($validatordata['password']),
-            'photo'    => $validatordata['photo']
+            'photo'    => $validatordata['photo'],
+            'uuid'     => $encryptuuid
+
         ]);
+
 
         // Memeriksa apakah proses pembuatan pengguna baru berhasil
         if ($user) {
             // Jika berhasil, mengembalikan respons JSON dengan status sukses dan data pengguna yang baru dibuat, serta status 201 (Created)
             return response()->json([
                 'success' => true,
+                'last_user' => $lastid,
+                'uuid' => $encryptuuid,
                 'user'   => $user,
             ], 201);
         }

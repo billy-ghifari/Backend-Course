@@ -43,6 +43,66 @@ class C_Auth extends Controller
         }
     }
 
+    public function loginadmin(Request $request)
+    {
+        try {
+            // Validasi data masukan: email dan password
+            $validator = Validator::make($request->all(), [
+                'email'    => 'required|email',
+                'password' => 'required',
+            ]);
+
+            // Jika validasi gagal, kembalikan respons JSON dengan pesan error 422
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 422);
+            }
+
+            // Memanggil fungsi login dari AuthHelper untuk proses otentikasi pengguna
+            $login = AuthHelper::loginadmin($request);
+
+            // Jika proses login gagal, kembalikan respons JSON dengan pesan error 422
+            if (!$login['status']) {
+                return response()->json($login['data'], 422);
+            }
+
+            // Mendapatkan informasi peran dari data yang dikembalikan oleh helper
+            $role = $login['data']['role'];
+
+            // Menentukan tindakan setelah login berdasarkan peran pengguna
+            switch ($role) {
+                case 'superadmin':
+                    // Lakukan sesuatu untuk superadmin
+                    return response()->json([
+                        'message' => 'Halo, Superadmin! Selamat datang.',
+                        'data' => $login['data']
+                    ]);
+                    break;
+                case 'admin':
+                    // Lakukan sesuatu untuk admin
+                    return response()->json([
+                        'message' => 'Halo, Admin! Selamat datang.',
+                        'data' => $login['data']
+                    ]);
+                    break;
+                case 'mentor':
+                    // Lakukan sesuatu untuk mentor
+                    return response()->json([
+                        'message' => 'Halo, Mentor! Selamat datang.',
+                        'data' => $login['data']
+                    ]);
+                    break;
+            }
+        } catch (\Exception $e) {
+            // Tangkap kesalahan jika terjadi selama proses login dan kembalikan respons JSON dengan informasi kesalahan
+
+            // Peran tidak valid
+            return response()->json([
+                'message' => 'Peran tidak valid.'
+            ], 403);
+        }
+    }
+
+
     //-------------------- Login --------------------//
 
 
@@ -115,7 +175,7 @@ class C_Auth extends Controller
         $email = $request->input('email');
 
         // Memulai proses forget password dengan memanggil fungsi forgetPassword dari AuthHelper
-        $resetLink = AuthHelper::forgetPassword($email);
+        $resetLink = AuthHelper::forgetPassword($request, $email);
 
         // Mengembalikan respons JSON dengan resetLink yang berisi informasi yang diperlukan untuk proses reset password
         return response()->json($resetLink);

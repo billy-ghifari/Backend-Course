@@ -3,6 +3,7 @@
 namespace App\Helper;
 
 use App\Models\kelas;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class Kelashelper
@@ -13,10 +14,80 @@ class Kelashelper
     public static function paginate()
     {
         // Mengambil data kelas dengan urutan terbaru dan menggunakan metode paginate() untuk membagi data menjadi halaman-halaman dengan dua kelas per halaman
-        $kelas = Kelas::latest()->paginate(2);
+        $kelas = Kelas::select('nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'category.nama_category', 'kelas.created_at')
+            ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa')
+            ->join('category', 'category.id', '=', 'kelas.r_id_category')
+            ->latest()
+            ->paginate(8);
 
         // Mengembalikan respons JSON yang berisi pesan 'List data review' dan data kelas yang telah dipaginasi
         return response()->json(['message' => 'List data review', 'data' => $kelas]);
+    }
+
+    public static function paginateall()
+    {
+        // Mengambil data kelas dengan urutan terbaru dan menggunakan metode paginateall() untuk membagi data menjadi halaman-halaman dengan dua kelas per halaman
+        $kelas = Kelas::select('nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'category.nama_category', 'kelas.created_at')
+            ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa')
+            ->join('category', 'category.id', '=', 'kelas.r_id_category')
+            ->inRandomOrder()
+            ->paginate(4);
+
+        // Mengembalikan respons JSON yang berisi pesan 'List data review' dan data kelas yang telah dipaginasi
+        return response()->json(['message' => 'List data review', 'data' => $kelas]);
+    }
+
+    public static function paginatekelas()
+    {
+        // Mengambil data kelas dengan urutan terbaru dan menggunakan metode paginatekelas() untuk membagi data menjadi halaman-halaman dengan dua kelas per halaman
+        $kelas = Kelas::inRandomOrder()->first();
+
+        // Mengembalikan respons JSON yang berisi pesan 'List data review' dan data kelas yang telah dipaginasi
+        return response()->json(['message' => 'List data review', 'data' => $kelas]);
+    }
+
+    public static function get_kelas()
+    {
+        $kelas = kelas::select('kelas.id', 'nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'category.nama_category', 'kelas.created_at')
+            ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa')
+            ->join('category', 'category.id', '=', 'kelas.r_id_category')
+            ->latest()
+            ->paginate(10);
+
+        return $kelas;
+    }
+
+    public static function getallkelas()
+    {
+        // Mengambil informasi user yang sedang terautentikasi (login)
+        $user = Auth::user();
+
+        // Memeriksa apakah pengguna terautentikasi
+        if (!$user) {
+            // Jika tidak terautentikasi, kembalikan respon JSON dengan pesan 'tidak ada siswa' dan status 401 (Unauthorized)
+            return response()->json(['message' => 'tidak ada siswa'], 401);
+        }
+
+        // Mengambil semua data pengguna yang memiliki peran (status) 'siswa'
+        $kelas = kelas::select('nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'kelas.created_at')
+            ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa')
+            ->count();
+
+        // Mengembalikan respon JSON yang berisi data siswa
+        return response()->json($kelas);
+    }
+
+    public static function getClassById($id)
+    {
+        try {
+            $class = Kelas::select('nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'kelas.created_at')
+                ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa')
+                ->findOrFail($id);
+
+            return $class;
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            throw new \Exception('Kelas tidak ditemukan');
+        }
     }
 
     //-------------------- Read Kelas --------------------//
@@ -33,6 +104,7 @@ class Kelashelper
             'deskripsi' => $validatordata['deskripsi'],
             'foto_thumbnail' => $validatordata['foto_thumbnail'],
             'r_id_non_siswa' => $validatordata['r_id_non_siswa'],
+            'r_id_category'  => $validatordata['r_id_category'],
         ]);
 
         // Mengembalikan respons JSON yang menyatakan bahwa data berhasil ditambahkan, serta data kelas yang baru saja ditambahkan ke database

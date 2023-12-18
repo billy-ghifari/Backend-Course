@@ -43,7 +43,30 @@ class C_materi extends Controller
 
     //--------------------Create Materi --------------------//
 
+    public function getallmateri()
+    {
+        try {
+            // Memanggil method dari Adminhelper untuk mendapatkan semua siswa
+            $allkelas = Materihelper::getallmateri();
 
+            return $allkelas; // Mengembalikan daftar semua siswa
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getmateri($id)
+    {
+        try {
+            $materi = Materihelper::getmateri($id); // Memanggil helper untuk mengambil materi berdasarkan ID kelas
+
+            return response()->json(['materi' => $materi], 200);
+        } catch (ModelNotFoundException $ex) {
+            return response()->json(['message' => 'Kelas tidak ditemukan'], 404);
+        } catch (\Exception $ex) {
+            return response()->json(['message' => $ex->getMessage()], 422);
+        }
+    }
 
     //-------------------- Update Materi --------------------//
 

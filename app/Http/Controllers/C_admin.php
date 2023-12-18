@@ -7,8 +7,6 @@ use App\Models\kelas;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
@@ -23,6 +21,18 @@ class C_admin extends Controller
         try {
             // Memanggil method dari Adminhelper untuk mendapatkan semua siswa
             $allsiswa = Adminhelper::allsiswa();
+
+            return $allsiswa; // Mengembalikan daftar semua siswa
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function siswa_on()
+    {
+        try {
+            // Memanggil method dari Adminhelper untuk mendapatkan semua siswa
+            $allsiswa = Adminhelper::siswa_on();
 
             return $allsiswa; // Mengembalikan daftar semua siswa
         } catch (\Exception $e) {
@@ -46,6 +56,23 @@ class C_admin extends Controller
             return $activation; // Mengembalikan respons aktivasi
         } catch (\Exception $e) {
             return response()->json(['message' => 'Gagal aktivasi '], 500);
+        }
+    }
+
+    public function get_siswa()
+    {
+        try {
+            $siswa = Adminhelper::get_siswa(); // Panggil helper untuk mendapatkan semua data blog
+
+            return response()->json([
+                'status' => true,
+                'data' => $siswa
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to fetch blogs.'
+            ], 500);
         }
     }
 
@@ -98,6 +125,22 @@ class C_admin extends Controller
 
 
     //-------------------- CRUD Admin --------------------//
+    public function alladmin()
+    {
+        try {
+            $admin = Adminhelper::alladmin(); // Panggil helper untuk mendapatkan semua data blog
+
+            return response()->json([
+                'status' => true,
+                'data' => $admin
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to fetch admin.'
+            ], 500);
+        }
+    }
 
     public function registeradmin(Request $request)
     {
@@ -176,11 +219,40 @@ class C_admin extends Controller
         return $deleteadmin;
     }
 
+    public function get_profile($id)
+    {
+        $profile = Adminhelper::get_profile($id);
+        return $profile;
+    }
+
+    public function getiduser($uuid)
+    {
+        $blog = Adminhelper::getiduser($uuid);
+        return $blog;
+    }
+
     //-------------------- CRUD Admin --------------------//
 
 
 
     //-------------------- CRUD Mentor --------------------//
+
+    public function allmentor()
+    {
+        try {
+            $mentor = Adminhelper::allmentor(); // Panggil helper untuk mendapatkan semua data blog
+
+            return response()->json([
+                'status' => true,
+                'data' => $mentor
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to fetch mentor.'
+            ], 500);
+        }
+    }
 
     public function registermentor(Request $request)
     {

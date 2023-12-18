@@ -3,6 +3,7 @@
 namespace App\Helper;
 
 use App\Models\materi;
+use Illuminate\Support\Facades\Auth;
 
 class Materihelper
 {
@@ -26,7 +27,26 @@ class Materihelper
 
     //-------------------- Create Materi --------------------//
 
+    public static function getallmateri()
+    {
+        // Mengambil semua data pengguna yang memiliki peran (status) 'siswa'
+        $materi = materi::select('kelas.nama', 'judul_materi', 'link_materi', 'deskripsi_materi', 'durasi', 'materi.created_at')
+            ->join('kelas', 'kelas.id', '=', 'materi.r_id_kelas')
+            ->count();
 
+        // Mengembalikan respon JSON yang berisi data siswa
+        return response()->json($materi);
+    }
+
+    public static function getmateri($id)
+    {
+        try {
+            $materi = Materi::where('r_id_kelas', $id)->get(); // Ambil materi berdasarkan ID kelas
+            return $materi;
+        } catch (\Exception $e) {
+            throw new \Exception('Gagal mengambil data materi');
+        }
+    }
 
     //-------------------- Update Materi --------------------//
 

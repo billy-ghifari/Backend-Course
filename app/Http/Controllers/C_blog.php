@@ -22,6 +22,58 @@ class C_blog extends Controller
         return $pagination;
     }
 
+    public function getall()
+    {
+        // Mengambil data kelas dengan paginasi menggunakan Kelashelper::paginateall()
+        $paginateall = Bloghelper::paginateall();
+
+        // Mengembalikan data paginasi sebagai respons
+        return $paginateall;
+    }
+
+
+    public function allblog()
+    {
+        try {
+            $blogs = Bloghelper::allblog(); // Panggil helper untuk mendapatkan semua data blog
+
+            return response()->json([
+                'status' => true,
+                'data' => $blogs
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to fetch blogs.'
+            ], 500);
+        }
+    }
+
+    public function getallblog()
+    {
+        try {
+            // Memanggil method dari Adminhelper untuk mendapatkan semua siswa
+            $allblog = Bloghelper::getallblog();
+
+            return $allblog; // Mengembalikan daftar semua siswa
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getblog($id)
+    {
+        try {
+            $blog = Bloghelper::getblog($id); // Memanggil helper untuk mengambil data kelas berdasarkan ID
+
+            return response()->json(['classData' => $blog], 200);
+        } catch (ModelNotFoundException $ex) {
+            return response()->json(['message' => 'Kelas tidak ditemukan'], 404);
+        } catch (\Exception $ex) {
+            return response()->json(['message' => $ex->getMessage()], 422);
+        }
+    }
+
     //-------------------- Read Blog --------------------//
 
 
@@ -65,6 +117,12 @@ class C_blog extends Controller
                 'message'       =>   $e,
             ]);
         }
+    }
+
+    public function get_blog($id)
+    {
+        $blog = Bloghelper::get_blog($id);
+        return $blog;
     }
 
     //-------------------- Create Blog --------------------//
