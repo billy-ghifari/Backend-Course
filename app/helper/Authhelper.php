@@ -95,7 +95,6 @@ class AuthHelper
         }
     }
 
-
     //-------------------- Login --------------------//
 
 
@@ -114,10 +113,9 @@ class AuthHelper
             'email'    => $validatordata['email'],
             'password' => bcrypt($validatordata['password']),
             'photo'    => $validatordata['photo'],
-            'uuid'     => $encryptuuid
+            'uuid'     => $encryptuuid,
 
         ]);
-
 
         // Memeriksa apakah proses pembuatan pengguna baru berhasil
         if ($user) {
@@ -158,7 +156,7 @@ class AuthHelper
 
             // Validasi input email dari request
             $validator = Validator::make($request->all(), [
-                'email' => 'required',
+                'email' => 'required|email',
             ]);
 
             // Mengambil data yang telah divalidasi

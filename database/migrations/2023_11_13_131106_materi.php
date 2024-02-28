@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('link_materi');
             $table->string('deskripsi_materi');
             $table->integer('durasi');
+            $table->enum('trash', ['non', 'aktif']);
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('materi');
     }
 };

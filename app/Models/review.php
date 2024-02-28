@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class review extends Model
 {
@@ -15,5 +16,9 @@ class review extends Model
 
     protected $guarded = ['id'];
 
-    protected $fillable = ['r_id_siswa', 'r_id_kelas', 'rating', 'review'];
+    protected $fillable = ['r_id_siswa', 'r_id_kelas', 'rating', 'review', 'trash'];
+
+    use SoftDeletes;
+
+    protected $dates = ['deleted_at'];
 }

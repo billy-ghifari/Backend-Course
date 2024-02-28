@@ -16,7 +16,7 @@ class C_category extends Controller
     {
         // Validasi data yang diterima dari request
         $validator = Validator::make($request->all(), [
-            'nama' => 'required'
+            'nama_category' => 'required'
         ]);
 
         // Jika validasi gagal, kembalikan respons dengan kode status 422 dan pesan error validasi
@@ -38,7 +38,26 @@ class C_category extends Controller
 
     //-------------------- Create Category --------------------//
 
+    //-------------------- Read Category --------------------//
 
+    public function getallcategory()
+    {
+        try {
+            $blogs = CategoryHelper::getallcategory(); // Panggil helper untuk mendapatkan semua data blog
+
+            return response()->json([
+                'status' => true,
+                'data' => $blogs
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to fetch blogs.'
+            ], 500);
+        }
+    }
+
+    //-------------------- Read Category --------------------//
 
     //-------------------- Update Category --------------------//
 
@@ -54,7 +73,7 @@ class C_category extends Controller
 
         // Validasi data yang diterima dari request
         $validator = Validator::make($request->all(), [
-            'nama' => 'required'
+            'nama_category' => 'required'
         ]);
 
         // Jika validasi gagal, kembalikan respons dengan pesan error validasi

@@ -198,7 +198,7 @@ class C_Auth extends Controller
         $password = $request->input('password');
 
         // Memanggil fungsi resetPassword dari AuthHelper dengan memberikan token dan password yang baru
-        $response = AuthHelper::resetPassword($token, $password);
+        $response = AuthHelper::resetPassword($request, $token, $password);
 
         // Mengembalikan respons dari fungsi resetPassword yang berisi hasil dari proses reset password
         return $response;

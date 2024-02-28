@@ -13,80 +13,78 @@ class Kelashelper
 
     public static function paginate()
     {
-        // Mengambil data kelas dengan urutan terbaru dan menggunakan metode paginate() untuk membagi data menjadi halaman-halaman dengan dua kelas per halaman
+        // Memilih kolom-kolom tertentu dari tabel Kelas beserta informasi terkait pengguna dan kategori
         $kelas = Kelas::select('nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'category.nama_category', 'kelas.created_at')
-            ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa')
-            ->join('category', 'category.id', '=', 'kelas.r_id_category')
-            ->latest()
-            ->paginate(8);
+            ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa') // Melakukan JOIN dengan tabel users berdasarkan kolom id
+            ->join('category', 'category.id', '=', 'kelas.r_id_category') // Melakukan JOIN dengan tabel category berdasarkan kolom id
+            ->latest() // Mengurutkan hasil dari yang terbaru berdasarkan kolom created_at
+            ->paginate(8); // Melakukan paginasi dengan menampilkan 8 entri per halaman
 
-        // Mengembalikan respons JSON yang berisi pesan 'List data review' dan data kelas yang telah dipaginasi
+        // Mengembalikan respons dalam format JSON yang berisi pesan 'List data review' dan data kelas yang telah dipaginasi
         return response()->json(['message' => 'List data review', 'data' => $kelas]);
     }
 
     public static function paginateall()
     {
-        // Mengambil data kelas dengan urutan terbaru dan menggunakan metode paginateall() untuk membagi data menjadi halaman-halaman dengan dua kelas per halaman
+        // Memilih kolom-kolom tertentu dari tabel Kelas beserta informasi terkait pengguna dan kategori
         $kelas = Kelas::select('nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'category.nama_category', 'kelas.created_at')
-            ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa')
-            ->join('category', 'category.id', '=', 'kelas.r_id_category')
-            ->inRandomOrder()
-            ->paginate(4);
+            ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa') // Melakukan JOIN dengan tabel users berdasarkan kolom id
+            ->join('category', 'category.id', '=', 'kelas.r_id_category') // Melakukan JOIN dengan tabel category berdasarkan kolom id
+            ->inRandomOrder() // Mengambil hasil secara acak
+            ->paginate(4); // Melakukan paginasi dengan menampilkan 4 entri per halaman
 
-        // Mengembalikan respons JSON yang berisi pesan 'List data review' dan data kelas yang telah dipaginasi
+        // Mengembalikan respons dalam format JSON yang berisi pesan 'List data review' dan data kelas yang telah dipaginasi secara acak
         return response()->json(['message' => 'List data review', 'data' => $kelas]);
     }
 
     public static function paginatekelas()
     {
-        // Mengambil data kelas dengan urutan terbaru dan menggunakan metode paginatekelas() untuk membagi data menjadi halaman-halaman dengan dua kelas per halaman
+        // Mengambil satu entri kelas secara acak dari tabel Kelas menggunakan inRandomOrder() dan first()
         $kelas = Kelas::inRandomOrder()->first();
 
-        // Mengembalikan respons JSON yang berisi pesan 'List data review' dan data kelas yang telah dipaginasi
+        // Mengembalikan respons dalam format JSON yang berisi pesan 'List data review' dan satu entri kelas yang dipilih secara acak
         return response()->json(['message' => 'List data review', 'data' => $kelas]);
     }
 
     public static function get_kelas()
     {
-        $kelas = kelas::select('kelas.id', 'nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'category.nama_category', 'kelas.created_at')
-            ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa')
-            ->join('category', 'category.id', '=', 'kelas.r_id_category')
-            ->latest()
-            ->paginate(10);
+        // Memilih kolom-kolom tertentu dari tabel Kelas beserta informasi terkait pengguna dan kategori
+        $kelas = Kelas::select('kelas.id', 'nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'category.nama_category', 'kelas.created_at')
+            ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa') // Melakukan JOIN dengan tabel users berdasarkan kolom id
+            ->join('category', 'category.id', '=', 'kelas.r_id_category') // Melakukan JOIN dengan tabel category berdasarkan kolom id
+            ->latest() // Mengurutkan hasil dari yang terbaru berdasarkan kolom created_at
+            ->paginate(10); // Melakukan paginasi dengan menampilkan 10 entri per halaman
 
-        return $kelas;
+        return $kelas; // Mengembalikan data kelas yang telah dipaginasi
     }
 
     public static function getallkelas()
     {
-        // Mengambil informasi user yang sedang terautentikasi (login)
-        $user = Auth::user();
+        $user = Auth::user(); // Memeriksa apakah terdapat pengguna yang terautentikasi
 
-        // Memeriksa apakah pengguna terautentikasi
         if (!$user) {
-            // Jika tidak terautentikasi, kembalikan respon JSON dengan pesan 'tidak ada siswa' dan status 401 (Unauthorized)
-            return response()->json(['message' => 'tidak ada siswa'], 401);
+            return response()->json(['message' => 'tidak ada siswa'], 401); // Jika tidak ada pengguna yang terautentikasi, kembalikan respons JSON dengan pesan 'tidak ada siswa' dan status kode 401
         }
 
-        // Mengambil semua data pengguna yang memiliki peran (status) 'siswa'
-        $kelas = kelas::select('nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'kelas.created_at')
-            ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa')
-            ->count();
+        // Menghitung jumlah entri kelas yang ada di basis data
+        $kelas = Kelas::select('nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'kelas.created_at')
+            ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa') // Melakukan JOIN dengan tabel users berdasarkan kolom id
+            ->count(); // Menghitung jumlah entri
 
-        // Mengembalikan respon JSON yang berisi data siswa
-        return response()->json($kelas);
+        return response()->json($kelas); // Mengembalikan respons JSON dengan jumlah entri kelas
     }
 
     public static function getClassById($id)
     {
         try {
+            // Mengambil detail kelas berdasarkan ID yang diberikan
             $class = Kelas::select('nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'kelas.created_at')
-                ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa')
-                ->findOrFail($id);
+                ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa') // Melakukan JOIN dengan tabel users berdasarkan kolom id
+                ->findOrFail($id); // Mengambil entri kelas dengan ID yang sesuai
 
-            return $class;
+            return $class; // Mengembalikan detail kelas
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            throw new \Exception('Kelas tidak ditemukan');
+            throw new \Exception('Kelas tidak ditemukan'); // Jika kelas dengan ID tersebut tidak ditemukan, lemparkan pengecualian dengan pesan 'Kelas tidak ditemukan'
         }
     }
 
@@ -98,7 +96,7 @@ class Kelashelper
 
     public static function makekelas($validatordata)
     {
-        // Membuat entri baru dalam tabel kelas berdasarkan data yang telah divalidasi
+        // Membuat entri baru dalam tabel Kelas dengan menggunakan data yang diterima
         $kelas = Kelas::create([
             'nama' => $validatordata['nama'],
             'deskripsi' => $validatordata['deskripsi'],
@@ -107,10 +105,9 @@ class Kelashelper
             'r_id_category'  => $validatordata['r_id_category'],
         ]);
 
-        // Mengembalikan respons JSON yang menyatakan bahwa data berhasil ditambahkan, serta data kelas yang baru saja ditambahkan ke database
+        // Mengembalikan respons dalam format JSON yang berisi pesan 'data berhasil ditambahkan' dan data kelas yang baru dibuat
         return response()->json(['message' => 'data berhasil ditambahkan', 'data' => $kelas], 200);
     }
-
 
     //-------------------- Create Kelas --------------------//
 
@@ -118,21 +115,23 @@ class Kelashelper
 
     //-------------------- Update Kelas --------------------//
 
-    public static function updatekelas($kelas, $validatordata)
+    public static function updatekelas($id, $validatordata)
     {
-        // Memeriksa apakah $validatordata tidak kosong atau terdefinisi
         if ($validatordata) {
-            // Jika $validatordata memiliki nilai, memperbarui atribut 'nama' dan 'deskripsi' dari kelas ($kelas) yang telah dipilih
-            $kelas->update([
-                'nama' => $validatordata['nama'],
-                'deskripsi' => $validatordata['deskripsi'],
-            ]);
+            // Memperbarui entri kelas yang memiliki ID sesuai dengan yang diberikan
+            $kelasupdate = Kelas::where('id', $id)
+                ->update([
+                    'nama'              => $validatordata['nama'],
+                    'deskripsi'         => $validatordata['deskripsi'],
+                    'foto_thumbnail'    => $validatordata['foto_thumbnail'],
+                    'r_id_non_siswa'    => $validatordata['r_id_non_siswa'],
+                    'r_id_category'     => $validatordata['r_id_category'],
+                ]);
         }
 
-        // Mengembalikan respons JSON yang menyatakan bahwa data berhasil diubah, serta data kelas yang telah diperbarui
-        return response()->json(['message' => 'data berhasil diubah', 'data' => $kelas], 200);
+        // Mengembalikan respons dalam format JSON yang berisi pesan 'data berhasil diubah' dan data entri kelas yang telah diperbarui
+        return response()->json(['message' => 'data berhasil diubah', 'data' => $kelasupdate], 200);
     }
-
 
     //-------------------- Update Kelas --------------------//
 
@@ -142,24 +141,21 @@ class Kelashelper
 
     public static function deletekelas($kelas)
     {
-        // Menghapus file foto thumbnail yang terkait dengan kelas dari penyimpanan (storage)
+        // Menghapus file thumbnail dari penyimpanan
         Storage::delete('public/profile/' . $kelas->foto_thumbnail);
 
-        // Memeriksa apakah penghapusan kelas berhasil
+        // Menghapus entri kelas dari database
         if ($kelas->delete()) {
-            // Jika penghapusan berhasil, mengembalikan respons yang berisi pesan 'Berhasil Menghapus Data'
             return response([
                 'Berhasil Menghapus Data'
-            ]);
+            ]); // Jika penghapusan entri kelas berhasil, kembalikan respons bahwa data berhasil dihapus
         } else {
-            // Jika penghapusan gagal, mengembalikan respons yang berisi pesan 'Tidak Berhasil Menghapus Data'
             return response([
                 'Tidak Berhasil Menghapus Data'
-            ]);
+            ]); // Jika penghapusan entri kelas gagal, kembalikan respons bahwa data tidak berhasil dihapus
         }
 
-        // Mengembalikan respons JSON yang menyatakan bahwa data berhasil dihapus dengan status kode HTTP 200 (OK)
-        return response()->json(['message' => 'data berhasil dihapus'], 200);
+        return response()->json(['message' => 'data berhasil dihapus'], 200); // Respons default jika tidak ada kondisi terpenuhi
     }
 
     //-------------------- Delete Kelas --------------------//

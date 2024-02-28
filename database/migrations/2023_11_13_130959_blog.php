@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('content');
             $table->string('foto_thumbnail');
             $table->integer('r_id_non_siswa');
+            $table->enum('trash', ['non', 'aktif']);
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('blog');
     }
 };

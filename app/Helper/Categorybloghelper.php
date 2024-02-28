@@ -48,6 +48,7 @@ class CategoryBlogHelper
     //-------------------- Create Category --------------------//
 
 
+
     //-------------------- Delete Category --------------------//
 
     public static function destroy($category)

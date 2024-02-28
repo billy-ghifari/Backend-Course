@@ -88,7 +88,7 @@ class C_blog extends Controller
                 'judul' => 'required',
                 'r_id_category' => 'required',
                 'content' => 'required',
-                'foto_thumbnail' => 'required|image', // Memastikan foto_thumbnail adalah file gambar
+                'foto_thumbnail' => 'required|image',
                 'r_id_non_siswa' => 'required'
             ]);
 
@@ -131,7 +131,7 @@ class C_blog extends Controller
 
     //-------------------- Update Blog --------------------//
 
-    public function update(Request $request, blog $blog, $id)
+    public function update(Request $request, $id)
     {
         try {
             // Mencari blog dengan ID yang diberikan
@@ -143,9 +143,11 @@ class C_blog extends Controller
 
         // Melakukan validasi terhadap input yang diberikan
         $validator = Validator::make($request->all(), [
-            'judul' => 'required',
-            'r_id_category' => 'required',
-            'content' => 'required',
+            'judul'          => 'required',
+            'r_id_category'  => 'required',
+            'content'        => 'required',
+            'foto_thumbnail' => 'required|image',
+            'r_id_non_siswa' => 'required'
         ]);
 
         // Jika validasi gagal, kembalikan pesan error 422
@@ -156,8 +158,18 @@ class C_blog extends Controller
         // Mendapatkan data yang telah divalidasi
         $validatordata = $validator->validated();
 
+        // Menyiapkan nama unik untuk file foto
+        $imageName = time() . '.' . $validatordata['foto_thumbnail']->extension();
+
+        // Memindahkan file foto ke direktori public/profile dengan nama unik
+        $request->file('foto_thumbnail')->move(public_path('blog'), $imageName);
+
+        // Menyimpan nama file foto ke dalam data yang akan disimpan
+        $validatordata['foto_thumbnail'] = $imageName;
+
+
         // Memanggil fungsi updateblog dari Bloghelper untuk memperbarui blog
-        $updateblog = Bloghelper::updateblog($validatordata, $blog);
+        $updateblog = Bloghelper::updateblog($validatordata, $id);
 
         return $updateblog;
     }
@@ -189,5 +201,5 @@ class C_blog extends Controller
         }
     }
 
-    //-------------------- Delete Blog --------------------//
+    //---------------;----- Delete Blog --------------------//
 }

@@ -128,8 +128,9 @@ class C_kelas extends Controller
 
     //-------------------- Update Kelas --------------------//
 
-    public function update(Request $request, $id)
+    public function update($id, Request $request)
     {
+        // return response()->json(['messages' => $request->all()]);
         try {
             // Mengambil data kelas berdasarkan ID
             $kelas = Kelas::findOrFail($id);
@@ -140,9 +141,13 @@ class C_kelas extends Controller
 
         // Validasi data yang diterima dari request
         $validator = Validator::make($request->all(), [
-            'nama' => 'required',
-            'deskripsi' => 'required',
+            'nama'           => 'required',
+            'deskripsi'      => 'required',
+            'foto_thumbnail' => 'required',
+            'r_id_non_siswa' => 'required',
+            'r_id_category'  => 'required'
         ]);
+
 
         // Jika validasi gagal, kembalikan pesan error
         if ($validator->fails()) {
@@ -152,8 +157,17 @@ class C_kelas extends Controller
         // Ambil data yang telah divalidasi
         $validatordata = $validator->validated();
 
+        // Menyiapkan nama unik untuk file foto
+        $imageName = time() . '.' . $validatordata['foto_thumbnail']->extension();
+
+        // Memindahkan file foto ke direktori public/profile dengan nama unik
+        $request->file('foto_thumbnail')->move(public_path('profile'), $imageName);
+
+        // Menyimpan nama file foto ke dalam data yang akan disimpan
+        $validatordata['foto_thumbnail'] = $imageName;
+
         // Panggil Kelashelper::updatekelas() untuk melakukan update data kelas
-        $updatekelas = Kelashelper::updatekelas($kelas, $validatordata);
+        $updatekelas = Kelashelper::updatekelas($id, $validatordata);
 
         // Kembalikan hasil operasi update kelas
         return $updatekelas;

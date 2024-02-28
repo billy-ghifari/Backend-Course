@@ -41,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
     //category
     Route::controller(C_category::class)->group(function () {
         Route::post('createcat', 'create')->middleware('forStatus:aktif', 'forRole:superadmin,admin,mentor');
+        Route::get('getallcategory', 'getallcategory')->middleware('forStatus:aktif');
         Route::put('/editcat/{id}', 'update')->middleware('forStatus:aktif', 'forRole:superadmin,admin,mentor');
         Route::delete('/deletecat/{id}', 'destroy')->middleware('forStatus:aktif', 'forRole:superadmin,admin,mentor');
     });
@@ -61,20 +62,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('allblog', 'allblog')->middleware('forStatus:aktif');
         Route::get('getallblog', 'getallblog')->middleware('forStatus:aktif');
         Route::get('/getoneblog/{id}', 'getblog')->middleware('forStatus:aktif');
-        Route::put('/editblog/{id}', 'update')->middleware('forStatus:aktif', 'forRole:superadmin,admin,mentor');
+        Route::post('/editblog/{id}', 'update')->middleware('forStatus:aktif', 'forRole:superadmin,admin,mentor');
         Route::delete('/deleteblog/{id}', 'destroy')->middleware('forStatus:aktif', 'forRole:superadmin,admin,mentor');
     });
 
     //kelas
     Route::controller(C_kelas::class)->group(function () {
         Route::post('createkelas', 'post_kelas')->middleware('forStatus:aktif', 'forRole:mentor');
-        Route::get('paginatesomekelas', 'getall_course')->middleware('forStatus:aktif',);
-        Route::get('paginatekelas', 'index')->middleware('forStatus:aktif',);
-        Route::get('getonekelas', 'getone_kelas')->middleware('forStatus:aktif',);
-        Route::get('getkelas', 'get_kelas')->middleware('forStatus:aktif',);
-        Route::get('getallkelas', 'getallkelas')->middleware('forStatus:aktif',);
-        Route::get('/getkelasbyid/{id}', 'getClassById')->middleware('forStatus:aktif',);
-        Route::put('/editkelas/{id}', 'update')->middleware('forStatus:aktif', 'forRole:mentor');
+        Route::get('paginatesomekelas', 'getall_course')->middleware('forStatus:aktif');
+        Route::get('paginatekelas', 'index')->middleware('forStatus:aktif');
+        Route::get('getonekelas', 'getone_kelas')->middleware('forStatus:aktif');
+        Route::get('getkelas', 'get_kelas')->middleware('forStatus:aktif');
+        Route::get('getallkelas', 'getallkelas')->middleware('forStatus:aktif');
+        Route::get('/getkelasbyid/{id}', 'getClassById')->middleware('forStatus:aktif');
+        Route::post('/editkelas/{id}', 'update')->middleware('forStatus:aktif', 'forRole:mentor');
         Route::delete('/deletekelas/{id}', 'destroy')->middleware('forStatus:aktif', 'forRole:mentor');
     });
 
@@ -100,6 +101,8 @@ Route::middleware('auth:sanctum')->group(function () {
     //crud admin
     Route::controller(C_admin::class)->group(function () {
         Route::post('registeradmin', 'registeradmin')->middleware('forStatus:aktif');
+        Route::post('makeadmin', 'makeadmin');
+        Route::post('makementor', 'makementor');
         Route::get('getalladmin', 'alladmin')->middleware('forStatus:aktif');
         Route::get('/getprofile/{id}', 'get_profile')->middleware('forStatus:aktif');
         Route::get('/getuuid/{uuid}', 'getiduser')->middleware('forStatus:aktif');

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('r_id_user');
             $table->string('review');
             $table->integer('r_id_kelas');
+            $table->enum('trash', ['non', 'aktif']);
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('kelas_siswa');
     }
 };

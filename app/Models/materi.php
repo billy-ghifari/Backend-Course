@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class materi extends Model
 {
@@ -14,4 +15,8 @@ class materi extends Model
     protected $table = 'materi';
 
     protected $guarded = ['id'];
+
+    use SoftDeletes;
+
+    protected $dates = ['deleted_at'];
 }

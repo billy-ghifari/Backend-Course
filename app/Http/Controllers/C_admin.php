@@ -19,11 +19,14 @@ class C_admin extends Controller
     public function index()
     {
         try {
-            // Memanggil method dari Adminhelper untuk mendapatkan semua siswa
+            // Mencoba untuk mengambil semua data siswa menggunakan Adminhelper::allsiswa()
             $allsiswa = Adminhelper::allsiswa();
 
-            return $allsiswa; // Mengembalikan daftar semua siswa
+            // Mengembalikan data siswa yang berhasil diambil
+            return $allsiswa;
         } catch (\Exception $e) {
+            // Jika terjadi kesalahan selama proses:
+            // Mengembalikan respons JSON dengan pesan error dan kode status 500 (Kesalahan Server Internal)
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
@@ -31,11 +34,14 @@ class C_admin extends Controller
     public function siswa_on()
     {
         try {
-            // Memanggil method dari Adminhelper untuk mendapatkan semua siswa
+            // Mencoba untuk mengambil data siswa yang aktif menggunakan Adminhelper::siswa_on()
             $allsiswa = Adminhelper::siswa_on();
 
-            return $allsiswa; // Mengembalikan daftar semua siswa
+            // Mengembalikan data siswa yang aktif yang berhasil diambil
+            return $allsiswa;
         } catch (\Exception $e) {
+            // Jika terjadi kesalahan selama proses:
+            // Mengembalikan respons JSON dengan pesan error dan kode status 500 (Kesalahan Server Internal)
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
@@ -44,17 +50,20 @@ class C_admin extends Controller
     {
         try {
             try {
-                // Mencari siswa berdasarkan ID, jika tidak ditemukan, akan mengembalikan respons JSON dengan pesan error
+                // Mencari siswa berdasarkan ID
                 $siswa = User::findOrFail($id);
             } catch (ModelNotFoundException $e) {
+                // Jika siswa tidak ditemukan, mengembalikan respons JSON dengan pesan error dan kode status 422 (Unprocessable Entity)
                 return response()->json("Tidak dapat menemukan siswa", 422);
             }
 
-            // Memanggil method dari Adminhelper untuk mengaktifkan siswa
+            // Mengaktifkan siswa menggunakan Adminhelper::activation($siswa)
             $activation = Adminhelper::activation($siswa);
 
-            return $activation; // Mengembalikan respons aktivasi
+            // Mengembalikan hasil aktivasi siswa
+            return $activation;
         } catch (\Exception $e) {
+            // Jika terjadi kesalahan selama proses aktivasi, mengembalikan respons JSON dengan pesan kesalahan dan kode status 500 (Kesalahan Server Internal)
             return response()->json(['message' => 'Gagal aktivasi '], 500);
         }
     }
@@ -62,16 +71,19 @@ class C_admin extends Controller
     public function get_siswa()
     {
         try {
-            $siswa = Adminhelper::get_siswa(); // Panggil helper untuk mendapatkan semua data blog
+            // Mengambil daftar siswa menggunakan Adminhelper::get_siswa()
+            $siswa = Adminhelper::get_siswa();
 
+            // Mengembalikan daftar siswa dalam respons JSON dengan status berhasil (true)
             return response()->json([
                 'status' => true,
                 'data' => $siswa
             ]);
         } catch (\Exception $e) {
+            // Jika terjadi kesalahan saat pengambilan data siswa, mengembalikan respons JSON dengan status gagal (false) dan pesan kesalahan, dengan kode status 500 (Kesalahan Server Internal)
             return response()->json([
                 'status' => false,
-                'message' => 'Failed to fetch blogs.'
+                'message' => 'Gagal mengambil data siswa.'
             ], 500);
         }
     }
@@ -80,18 +92,21 @@ class C_admin extends Controller
     {
         try {
             try {
-                // Mencari siswa berdasarkan ID, jika tidak ditemukan, akan mengembalikan respons JSON dengan pesan error
+                // Mencari siswa berdasarkan ID
                 $siswa = User::findOrFail($id);
             } catch (ModelNotFoundException $e) {
+                // Jika siswa tidak ditemukan, mengembalikan respons JSON dengan pesan error dan kode status 422 (Unprocessable Entity)
                 return response()->json("Tidak dapat menemukan siswa", 422);
             }
 
-            // Memanggil method dari Adminhelper untuk menonaktifkan siswa
+            // Menonaktifkan siswa menggunakan Adminhelper::nonactivation($siswa)
             $nonactivation = Adminhelper::nonactivation($siswa);
 
-            return $nonactivation; // Mengembalikan respons non-aktivasi
+            // Mengembalikan hasil non-aktivasi siswa
+            return $nonactivation;
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Gagal aktivasi ' . $e->getMessage()], 500);
+            // Jika terjadi kesalahan selama proses non-aktivasi, mengembalikan respons JSON dengan pesan kesalahan yang mencakup pesan dari pengecualian yang terjadi, dengan kode status 500 (Kesalahan Server Internal)
+            return response()->json(['message' => 'Gagal non-aktivasi ' . $e->getMessage()], 500);
         }
     }
 
@@ -107,15 +122,15 @@ class C_admin extends Controller
             // Mencari kelas berdasarkan ID
             $kelas = Kelas::findOrFail($id);
 
-            // Mengupdate status kelas menjadi 'aktif'
+            // Memperbarui status kelas menjadi 'aktif'
             $kelas->update([
                 'status' => 'aktif'
             ]);
 
-            // Mengembalikan respons JSON yang menyatakan bahwa kelas sudah diaktifkan beserta data kelas yang sudah diubah
-            return response()->json(['message' => 'akun sudah aktif', 'data' => $kelas], 200);
+            // Mengembalikan respons JSON dengan pesan sukses dan data kelas yang telah diaktifkan, dengan kode status 200 (OK)
+            return response()->json(['message' => 'Akun sudah aktif', 'data' => $kelas], 200);
         } catch (\Exception $e) {
-            // Jika terjadi kesalahan selama proses aktivasi kelas, mengembalikan respons JSON dengan pesan kesalahan beserta informasi exception
+            // Jika terjadi kesalahan selama proses aktivasi, mengembalikan respons JSON dengan pesan kesalahan yang mencakup pesan dari pengecualian yang terjadi, dengan kode status 500 (Kesalahan Server Internal)
             return response()->json(['message' => 'Gagal aktivasi ' . $e->getMessage()], 500);
         }
     }
@@ -125,110 +140,120 @@ class C_admin extends Controller
 
 
     //-------------------- CRUD Admin --------------------//
+
+    public function makeadmin(Request $request)
+    {
+        // Validasi data input dari request
+        $validator = Validator::make($request->all(), [
+            'name'     => 'required',
+            'email'    => 'required|email|unique:users',
+            'password' => 'required',
+            'photo'    => 'required|image'
+        ]);
+
+        // Jika validasi gagal, kembalikan respons JSON dengan error 422 (Unprocessable Entity)
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // Dapatkan data yang telah divalidasi
+        $validatordata = $validator->validated();
+
+        // Simpan foto admin dengan nama unik di folder 'profile'
+        $imageName = time() . '.' . $validatordata['photo']->extension();
+        $request->photo->move(public_path('profile'), $imageName);
+        $validatordata['photo'] = $imageName;
+
+        // Buat admin baru menggunakan Adminhelper::makeadmin($validatordata)
+        $user = Adminhelper::makeadmin($validatordata);
+
+        // Jika pembuatan admin berhasil, kembalikan respons JSON dengan sukses dan data admin, kode status 201 (Created)
+        if ($user) {
+            return response()->json([
+                'success' => true,
+                'user'    => $user,
+            ], 201);
+        }
+
+        // Jika gagal membuat admin, kembalikan respons JSON dengan status kegagalan (false)
+        return response()->json([
+            'success' => false,
+        ]);
+    }
+
     public function alladmin()
     {
         try {
-            $admin = Adminhelper::alladmin(); // Panggil helper untuk mendapatkan semua data blog
+            // Ambil semua data admin menggunakan Adminhelper::alladmin()
+            $admin = Adminhelper::alladmin();
 
+            // Kembalikan data admin dalam respons JSON dengan status berhasil (true)
             return response()->json([
                 'status' => true,
                 'data' => $admin
             ]);
         } catch (\Exception $e) {
+            // Jika terjadi kesalahan saat mengambil data admin, kembalikan respons JSON dengan status gagal (false) dan pesan kesalahan, dengan kode status 500 (Kesalahan Server Internal)
             return response()->json([
                 'status' => false,
-                'message' => 'Failed to fetch admin.'
+                'message' => 'Gagal mengambil admin.'
             ], 500);
         }
     }
 
-    public function registeradmin(Request $request)
-    {
-        // Membuat validator untuk memeriksa data masukan dari request
-        $validator = Validator::make($request->all(), [
-            'name'     => 'required',
-            'email'    => 'required|email|unique:users',
-            'password' => 'required',
-            'photo'    => 'required|image',
-        ]);
-
-        // Jika validasi gagal, kembalikan respons JSON yang berisi pesan kesalahan validasi dengan kode status 422
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-        // Mendapatkan data yang telah divalidasi untuk diproses lebih lanjut
-        $validatordata = $validator->validated();
-
-        // Membuat nama unik untuk file gambar yang diunggah berdasarkan waktu saat ini dan ekstensi file gambar
-        $imageName = time() . '.' . $validatordata['photo']->extension();
-
-        // Memindahkan gambar yang diunggah ke direktori 'public/profile' dengan nama baru yang telah dibuat
-        $request->photo->move(public_path('profile'), $imageName);
-
-        // Menyimpan nama file gambar yang telah diunggah ke dalam data yang akan disimpan dalam database
-        $validatordata['photo'] = $imageName;
-
-        // Memanggil fungsi makeadmin() dari Adminhelper untuk membuat admin baru dengan data yang telah divalidasi
-        $makeadmin = Adminhelper::makeadmin($validatordata);
-
-        // Mengembalikan respons JSON berisi pesan berhasil jika admin berhasil dibuat
-        return $makeadmin;
-    }
-
     public function updateadmin(Request $request, $id)
     {
-        // Mencari admin berdasarkan ID dan peran ('admin') yang diberikan
+        // Cari admin berdasarkan ID dan peran ('role') admin
         $admin = User::where('id', $id)->where('role', 'admin')->first();
 
-        // Membuat validator untuk memeriksa data masukan dari request
+        // Validasi data input dari request
         $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|required',
-            'email' => 'sometimes|required',
+            'name' => 'required',
+            'email' => 'required',
         ]);
 
-        // Jika validasi gagal, kembalikan respons JSON yang berisi pesan kesalahan validasi dengan kode status 422
+        // Jika validasi gagal, kembalikan respons JSON dengan error 422 (Unprocessable Entity)
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        // Mendapatkan data yang telah divalidasi untuk diproses lebih lanjut
+        // Dapatkan data yang telah divalidasi
         $validatordata = $validator->validated();
 
-        // Memanggil fungsi editadmin() dari Adminhelper untuk mengedit admin yang ditemukan
+        // Edit data admin menggunakan Adminhelper::editadmin($admin, $validatordata)
         $editadmin = Adminhelper::editadmin($admin, $validatordata);
 
-        // Mengembalikan respons JSON berisi hasil dari pengeditan admin
-        return $editadmin;
+        return $editadmin; // Kembalikan respons (hasil dari editadmin)
     }
 
     public function destroyadmin($id)
     {
         try {
-            // Mencari admin berdasarkan ID dan peran ('admin') yang diberikan
+            // Cari admin berdasarkan ID dan peran ('role') admin
             $admin = User::where('id', $id)->where('role', 'admin')->first();
         } catch (ModelNotFoundException $e) {
-            // Jika admin tidak ditemukan, kembalikan respons JSON dengan pesan kesalahan dan kode status 422
+            // Jika tidak ditemukan admin dengan ID tersebut, kembalikan respons JSON dengan pesan error dan kode status 422 (Unprocessable Entity)
             return response()->json("Bukan admin", 422);
         }
 
-        // Memanggil fungsi deleteadmin() dari Adminhelper untuk menghapus admin yang ditemukan
+        // Hapus admin menggunakan Adminhelper::deleteadmin($admin)
         $deleteadmin = Adminhelper::deleteadmin($admin);
 
-        // Mengembalikan respons JSON berisi hasil dari penghapusan admin
-        return $deleteadmin;
+        return $deleteadmin; // Kembalikan respons (hasil dari deleteadmin)
     }
 
     public function get_profile($id)
     {
+        // Ambil profil admin berdasarkan ID menggunakan Adminhelper::get_profile($id)
         $profile = Adminhelper::get_profile($id);
-        return $profile;
+        return $profile; // Kembalikan respons (profil admin)
     }
 
     public function getiduser($uuid)
     {
+        // Ambil data pengguna berdasarkan UUID menggunakan Adminhelper::getiduser($uuid)
         $blog = Adminhelper::getiduser($uuid);
-        return $blog;
+        return $blog; // Kembalikan respons (data pengguna)
     }
 
     //-------------------- CRUD Admin --------------------//
@@ -237,34 +262,17 @@ class C_admin extends Controller
 
     //-------------------- CRUD Mentor --------------------//
 
-    public function allmentor()
+    public function makementor(Request $request)
     {
-        try {
-            $mentor = Adminhelper::allmentor(); // Panggil helper untuk mendapatkan semua data blog
-
-            return response()->json([
-                'status' => true,
-                'data' => $mentor
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Failed to fetch mentor.'
-            ], 500);
-        }
-    }
-
-    public function registermentor(Request $request)
-    {
-        // Validasi data dari request untuk membuat mentor baru
+        // Validasi data input dari request
         $validator = Validator::make($request->all(), [
             'name'     => 'required',
             'email'    => 'required|email|unique:users',
             'password' => 'required',
-            'photo'    => 'required|image',
+            'photo'    => 'required|image'
         ]);
 
-        // Jika validasi gagal, kembalikan respons JSON dengan pesan error 422
+        // Jika validasi gagal, kembalikan respons JSON dengan error 422 (Unprocessable Entity)
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
@@ -272,92 +280,87 @@ class C_admin extends Controller
         // Dapatkan data yang telah divalidasi
         $validatordata = $validator->validated();
 
-        // Simpan foto ke dalam direktori 'profile'
+        // Simpan foto mentor dengan nama unik di folder 'profile'
         $imageName = time() . '.' . $validatordata['photo']->extension();
         $request->photo->move(public_path('profile'), $imageName);
         $validatordata['photo'] = $imageName;
 
-        // Buat mentor baru menggunakan data yang telah divalidasi
-        $user = User::create([
-            'name'     => $validatordata['name'],
-            'email'    => $validatordata['email'],
-            'password' => bcrypt($validatordata['password']),
-            'photo'    => $validatordata['photo'],
-            'role'     => 'mentor',
-            'status'   => 'aktif'
-        ]);
+        // Buat mentor baru menggunakan Adminhelper::makementor($validatordata)
+        $user = Adminhelper::makementor($validatordata);
 
-        // Jika pembuatan mentor berhasil, kembalikan respons JSON dengan data user yang baru dibuat
+        // Jika pembuatan mentor berhasil, kembalikan respons JSON dengan sukses dan data mentor, kode status 201 (Created)
         if ($user) {
             return response()->json([
                 'success' => true,
-                'user'   => $user,
+                'user'    => $user,
             ], 201);
         }
 
-        // Jika terjadi kegagalan dalam pembuatan mentor, kembalikan respons JSON dengan nilai 'success' false
+        // Jika gagal membuat mentor, kembalikan respons JSON dengan status kegagalan (false)
         return response()->json([
             'success' => false,
         ]);
     }
 
-    public function updatementor(Request $request, $id)
+    public function allmentor()
     {
         try {
-            // Cari mentor berdasarkan ID
-            $mentor = User::where('id', $id)
-                ->where('role', 'mentor')->first();
+            // Ambil semua data mentor menggunakan Adminhelper::allmentor()
+            $mentor = Adminhelper::allmentor();
 
-            // Validasi data yang akan diubah
-            $validator = Validator::make($request->all(), [
-                'name' => 'sometimes|required',
-                'email' => 'sometimes|required',
+            // Kembalikan data mentor dalam respons JSON dengan status berhasil (true)
+            return response()->json([
+                'status' => true,
+                'data' => $mentor
             ]);
-
-            // Jika validasi gagal, kembalikan respons JSON dengan pesan error 422
-            if ($validator->fails()) {
-                return response()->json($validator->errors(), 422);
-            }
-
-            // Dapatkan data yang telah divalidasi
-            $validatordata = $validator->validated();
-
-            // Panggil fungsi editadmin dari Adminhelper untuk mengubah data mentor
-            $editmentor = Adminhelper::editadmin($mentor, $validatordata);
-
-            // Jika mentor tidak ditemukan, kembalikan respons JSON dengan pesan 'User not found or not an admin'
-            if (!$mentor) {
-                return response()->json(['message' => 'User not found or not an admin'], 404);
-            }
-
-            // Jika berhasil, kembalikan respons JSON dengan pesan 'User updated successfully' dan data mentor yang sudah diubah
-            return response()->json(['message' => 'User updated successfully', 'user' => $mentor]);
         } catch (\Exception $e) {
-            // Jika terjadi kesalahan selama proses update, kembalikan respons JSON dengan pesan kesalahan dan status 500
-            return response()->json(['message' => $e->getMessage()], 500);
+            // Jika terjadi kesalahan saat mengambil data mentor, kembalikan respons JSON dengan status gagal (false) dan pesan kesalahan, dengan kode status 500 (Kesalahan Server Internal)
+            return response()->json([
+                'status' => false,
+                'message' => 'Gagal mengambil mentor.'
+            ], 500);
         }
+    }
+
+    public function updatementor(Request $request, $id)
+    {
+        // Cari mentor berdasarkan ID dan peran ('role') mentor
+        $mentor = User::where('id', $id)->where('role', 'mentor')->first();
+
+        // Validasi data input dari request
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required',
+        ]);
+
+        // Jika validasi gagal, kembalikan respons JSON dengan error 422 (Unprocessable Entity)
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // Dapatkan data yang telah divalidasi
+        $validatordata = $validator->validated();
+
+        // Edit data mentor menggunakan Adminhelper::editmentor($mentor, $validatordata)
+        $editmentor = Adminhelper::editmentor($mentor, $validatordata);
+
+        return $editmentor; // Kembalikan respons (hasil dari editmentor)
     }
 
     public function destroymentor($id)
     {
         try {
-            // Cari mentor berdasarkan ID
-            $mentor = User::where('id', $id)
-                ->where('role', 'mentor')->first();
+            // Cari mentor berdasarkan ID dan peran ('role') mentor
+            $mentor = User::where('id', $id)->where('role', 'mentor')->first();
 
-            // Hapus foto dari direktori 'profile' dan hapus data mentor
+            // Hapus foto mentor dan hapus data mentor
             Storage::delete('public/profile/' . $mentor->photo);
             if ($mentor->delete()) {
-                return response([
-                    'Berhasil Menghapus Data'
-                ]);
+                return response(['Berhasil Menghapus Data']);
             } else {
-                return response([
-                    'Tidak Berhasil Menghapus Data'
-                ]);
+                return response(['Tidak Berhasil Menghapus Data']);
             }
         } catch (Throwable $ex) {
-            // Tangkap kesalahan jika terjadi dan kembalikan respons JSON dengan informasi kesalahan
             return response()->json($ex, 422);
         }
     }

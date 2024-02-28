@@ -10,12 +10,12 @@ class CategoryHelper
 
     public static function create($validatedData)
     {
-        // Membuat entri baru dalam tabel Category berdasarkan data yang telah divalidasi
+        // Membuat entri baru dalam tabel Category dengan menggunakan data yang telah divalidasi
         $category = Category::create([
-            'nama' => $validatedData['nama']
+            'nama_category' => $validatedData['nama_category'] // Mengambil nilai 'nama_category' dari data yang divalidasi
         ]);
 
-        // Mengembalikan objek $category yang merupakan instance dari model Category yang baru saja dibuat
+        // Mengembalikan entri Category yang baru saja dibuat
         return $category;
     }
 
@@ -23,16 +23,31 @@ class CategoryHelper
 
 
 
+    //-------------------- Read Category --------------------//
+
+    public static function getallcategory()
+    {
+        // Mengambil semua entri kategori dari tabel category
+        $categories = Category::all();
+
+        // Mengembalikan respons dalam format JSON yang berisi semua entri kategori
+        return response()->json($categories);
+    }
+
+    //-------------------- Read Category --------------------//
+
+
+
     //-------------------- Update Category --------------------//
 
     public static function update(Category $category, $requestData)
     {
-        // Memperbarui atribut 'nama' dari kategori ($category) yang telah dipilih
+        // Memperbarui entri kategori dengan data yang diberikan
         $category->update([
-            'nama' => $requestData['nama']
+            'nama_category' => $requestData['nama_category'] // Memperbarui nilai 'nama_category' dengan nilai yang diberikan dari $requestData
         ]);
 
-        // Mengembalikan respons JSON yang menyatakan bahwa data berhasil diubah dan mencakup data kategori yang telah diperbarui
+        // Mengembalikan respons JSON yang menyatakan bahwa data berhasil diubah bersama dengan detail data kategori yang telah diperbarui
         return response()->json(['message' => 'data berhasil diubah', 'data' => $category], 200);
     }
 
@@ -45,14 +60,13 @@ class CategoryHelper
     public static function destroy($category)
     {
         try {
-            // Menghapus entri kategori yang diberikan ($category)
+            // Menghapus entri kategori
             $category->delete();
 
-            // Mengembalikan respons JSON yang menyatakan bahwa data berhasil dihapus dengan status kode 200 (OK)
+            // Mengembalikan respons JSON yang menyatakan bahwa data berhasil dihapus
             return response()->json(['message' => 'data berhasil dihapus'], 200);
         } catch (\Exception $ex) {
-            // Jika terjadi exception (kesalahan) selama proses penghapusan, tangkap exception tersebut
-            // dan kembalikan respons JSON yang berisi informasi tentang exception dengan status kode 422 (Unprocessable Entity)
+            // Jika terjadi exception saat penghapusan, mengembalikan respons JSON dengan pesan exception dan status kode 422
             return response()->json($ex, 422);
         }
     }

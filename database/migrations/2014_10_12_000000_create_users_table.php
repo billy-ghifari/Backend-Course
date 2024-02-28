@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('password');
             $table->enum('status', ['non', 'aktif']);
             $table->enum('role', ['superadmin', 'admin', 'mentor', 'siswa']);
+            $table->enum('trash', ['non', 'aktif']);
             $table->rememberToken();
             $table->timestamps();
         });

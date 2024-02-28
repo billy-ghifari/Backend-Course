@@ -11,15 +11,14 @@ class Bloghelper
 
     public static function pagination()
     {
-        // Mengambil data blog dengan urutan terbaru dan menggunakan metode paginate() untuk membagi data menjadi halaman-halaman dengan lima blog per halaman
-        $blogs = Blog::select('judul', 'category.nama_category', 'content', 'foto_thumbnail', 'users.name', 'users.photo', 'blog.created_at')
-            ->join('category', 'category.id', '=', 'blog.r_id_category')
+        // Mengambil daftar blog terbaru dengan paginasi 4 entri per halaman.
+        $blogs = Blog::select('blog.id', 'judul', 'category_blog.nama', 'content', 'foto_thumbnail', 'users.name', 'users.photo', 'blog.created_at')
             ->join('users', 'users.id', '=', 'blog.r_id_non_siswa')
+            ->join('category_blog', 'category_blog.id', '=', 'blog.r_id_category')
             ->latest()
             ->paginate(4);
 
-
-        // Mengembalikan respons JSON yang berisi pesan 'List data review' dan data blog yang telah dipaginasi
+        // Mengembalikan respons JSON dengan pesan 'List data review' dan data blog dalam format paginasi.
         return response()->json([
             'message' => 'List data review', 'data' => $blogs
         ]);
@@ -27,97 +26,113 @@ class Bloghelper
 
     public static function paginateall()
     {
-        $blog = blog::select('judul', 'category.nama_category', 'content', 'foto_thumbnail', 'users.name', 'users.photo', 'blog.created_at')
+        // Mengambil daftar blog secara acak dengan paginasi 4 entri per halaman.
+        $blog = Blog::select('blog.id', 'judul', 'category_blog.nama', 'content', 'foto_thumbnail', 'users.name', 'users.photo', 'blog.created_at')
             ->join('users', 'users.id', '=', 'blog.r_id_non_siswa')
-            ->join('category', 'category.id', '=', 'blog.r_id_category')
+            ->join('category_blog', 'category_blog.id', '=', 'blog.r_id_category')
             ->inRandomOrder()
             ->paginate(4);
 
+        // Mengembalikan respons JSON dengan pesan 'List data review' dan data blog dalam format paginasi.
         return response()->json(['message' => 'List data review', 'data' => $blog]);
     }
 
     public static function allblog()
     {
-        $blogs = blog::select('blog.id', 'judul', 'category_blog.nama', 'content', 'foto_thumbnail', 'users.name', 'users.photo', 'blog.created_at')
-            ->join('users', 'users.id', '=', 'blog.r_id_non_siswa')
-            ->join('category_blog', 'category_blog.id', '=', 'blog.r_id_category')
-            ->paginate(10);
+        // Mengambil semua blog dengan seleksi kolom tertentu, termasuk informasi terkait pengguna dan kategori blog
+        $blogs = Blog::select('blog.id', 'judul', 'category_blog.nama', 'content', 'foto_thumbnail', 'users.name', 'users.photo', 'blog.created_at')
+            ->join('users', 'users.id', '=', 'blog.r_id_non_siswa') // Menghubungkan blog dengan pengguna non-siswa
+            ->join('category_blog', 'category_blog.id', '=', 'blog.r_id_category') // Menghubungkan blog dengan kategori
+            ->paginate(10); // Melakukan paginasi dengan 10 entri per halaman
 
+        // Mengembalikan daftar blog dalam format paginasi
         return $blogs;
     }
 
     public static function getallblog()
     {
-        // Mengambil semua data pengguna yang memiliki peran (status) 'siswa'
-        $blog = blog::count();
+        // Menghitung jumlah total blog yang ada
+        $blog = Blog::count();
 
-        // Mengembalikan respon JSON yang berisi data siswa
+        // Mengembalikan jumlah blog dalam format JSON
         return response()->json($blog);
     }
 
     public static function getblog($id)
     {
         try {
-            $blog = blog::select('judul', 'category_blog.nama', 'content', 'foto_thumbnail', 'users.name', 'users.photo', 'blog.created_at')
-                ->join('users', 'users.id', '=', 'blog.r_id_non_siswa')
-                ->join('category_blog', 'category_blog.id', '=', 'blog.r_id_category')
-                ->findOrFail($id);
+            // Mengambil detail blog berdasarkan ID yang diberikan
+            $blog = Blog::select('blog.id', 'judul', 'category_blog.nama', 'content', 'foto_thumbnail', 'users.name', 'users.photo', 'blog.created_at')
+                ->join('users', 'users.id', '=', 'blog.r_id_non_siswa') // Menghubungkan blog dengan pengguna non-siswa
+                ->join('category_blog', 'category_blog.id', '=', 'blog.r_id_category') // Menghubungkan blog dengan kategori
+                ->findOrFail($id); // Mengambil blog dengan ID yang cocok
 
+            // Mengembalikan detail blog
             return $blog;
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Jika blog tidak ditemukan, lemparkan pengecualian dengan pesan 'blog tidak ditemukan'
             throw new \Exception('blog tidak ditemukan');
         }
     }
 
     public static function get_blog($id)
     {
-        // Mengambil semua data pengguna yang memiliki peran (status) 'siswa'
-        $profile = blog::findOrFail($id)->value();
+        // Mengambil profil blog berdasarkan ID yang diberikan
+        $profile = Blog::findOrFail($id)->value();
 
-        // Memeriksa apakah pengguna terautentikasi
+        // Jika profil tidak ditemukan, mengembalikan respons JSON dengan pesan 'tidak ada siswa'
         if (!$profile) {
-            // Jika tidak terautentikasi, kembalikan respon JSON dengan pesan 'tidak ada siswa' dan status 401 (Unauthorized)
             return response()->json(['message' => 'tidak ada siswa'], 401);
         }
 
-        // Mengembalikan respon JSON yang berisi data siswa
+        // Mengembalikan profil blog dalam format JSON
         return response()->json($profile);
     }
 
     //-------------------- Read Blog --------------------//
 
+
+
+    //-------------------- Create Blog --------------------//
+
     public static function makeblog($validatordata)
     {
-        // Membuat entri baru dalam tabel blog berdasarkan data yang telah divalidasi
+        // Membuat entri baru dalam tabel Blog dengan menggunakan data dari $validatordata
         $post = Blog::create([
-            'judul' => $validatordata['judul'],
-            'r_id_category' => $validatordata['r_id_category'],
-            'content' => $validatordata['content'],
-            'foto_thumbnail' => $validatordata['foto_thumbnail'],
-            'r_id_non_siswa' => $validatordata['r_id_non_siswa']
+            'judul' => $validatordata['judul'], // Mengambil judul dari data yang divalidasi sebelumnya
+            'r_id_category' => $validatordata['r_id_category'], // Mengambil ID kategori dari data yang divalidasi
+            'content' => $validatordata['content'], // Mengambil konten dari data yang divalidasi
+            'foto_thumbnail' => $validatordata['foto_thumbnail'], // Mengambil foto thumbnail dari data yang divalidasi
+            'r_id_non_siswa' => $validatordata['r_id_non_siswa'] // Mengambil ID pengguna non-siswa dari data yang divalidasi
         ]);
 
-        // Mengembalikan respons JSON yang berisi pesan 'data berhasil ditambahkan' dan data blog yang baru ditambahkan
+        // Mengembalikan respons JSON yang memberikan informasi bahwa data berhasil ditambahkan beserta data yang baru saja dibuat
         return response()->json(['message' => 'data berhasil ditambahkan', 'data' => $post], 200);
     }
 
+    //-------------------- Create Blog --------------------//
+
+
+
     //-------------------- Update Blog --------------------//
 
-    public static function updateblog($validatordata, $post)
+    public static function updateblog($validatordata, $id)
     {
-        // Memeriksa apakah $validatordata tidak kosong atau terdefinisi
         if ($validatordata) {
-            // Jika $validatordata memiliki nilai, memperbarui atribut-atribut tertentu dari $post (blog) yang diidentifikasi oleh parameter $post
-            $post->update([
-                'judul' => $validatordata['judul'],
-                'r_id_category' => $validatordata['r_id_category'],
-                'content' => $validatordata['content'],
-            ]);
+            // Melakukan pembaruan pada entri blog dengan ID yang sesuai
+            $blogupdate = Blog::where('id', $id)
+                ->update([
+                    'judul'           => $validatordata['judul'], // Memperbarui judul dengan data yang divalidasi
+                    'r_id_category'   => $validatordata['r_id_category'], // Memperbarui ID kategori dengan data yang divalidasi
+                    'content'         => $validatordata['content'], // Memperbarui konten dengan data yang divalidasi
+                    'foto_thumbnail'  => $validatordata['foto_thumbnail'], // Memperbarui foto thumbnail dengan data yang divalidasi
+                    'r_id_non_siswa'  => $validatordata['r_id_non_siswa'] // Memperbarui ID pengguna non-siswa dengan data yang divalidasi
+                ]);
         }
 
-        // Mengembalikan respons JSON yang menyatakan bahwa data berhasil diubah, serta data blog yang telah diperbarui
+        // Mengembalikan respons JSON yang menyatakan bahwa data telah berhasil diubah beserta detail data yang telah diperbarui
         return response()->json([
-            'message' => 'data berhasil diubah', 'data' => $post
+            'message' => 'data berhasil diubah', 'data' => $blogupdate
         ], 200);
     }
 
@@ -129,23 +144,23 @@ class Bloghelper
 
     public static function deleteblog($post)
     {
-        // Menghapus file foto thumbnail terkait dengan blog dari penyimpanan (storage)
+        // Menghapus foto thumbnail terkait dari penyimpanan
         Storage::delete('public/profile/' . $post->foto_thumbnail);
 
-        // Memeriksa apakah penghapusan blog berhasil
+        // Menghapus entri blog dari basis data
         if ($post->delete()) {
-            // Jika penghapusan berhasil, mengembalikan respons dengan pesan 'Berhasil Menghapus Data'
+            // Jika penghapusan entri berhasil, mengembalikan respons dengan pesan 'Berhasil Menghapus Data'
             return response([
                 'Berhasil Menghapus Data'
             ]);
         } else {
-            // Jika penghapusan gagal, mengembalikan respons dengan pesan 'Tidak Berhasil Menghapus Data'
+            // Jika penghapusan entri gagal, mengembalikan respons dengan pesan 'Tidak Berhasil Menghapus Data'
             return response([
                 'Tidak Berhasil Menghapus Data'
             ]);
         }
 
-        // Mengembalikan respons JSON yang menyatakan bahwa data berhasil dihapus dengan status kode HTTP 200 (OK)
+        // Respons ini tidak akan pernah tercapai karena blok kode di atasnya sudah mengembalikan respons sebelumnya
         return response()->json(['message' => 'data berhasil dihapus'], 200);
     }
 

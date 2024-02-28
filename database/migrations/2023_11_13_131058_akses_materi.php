@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('r_id_kelas');
             $table->integer('r_id_siswa');
             $table->integer('r_id_materi');
+            $table->enum('trash', ['non', 'aktif']);
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('akses_materi');
     }
 };
