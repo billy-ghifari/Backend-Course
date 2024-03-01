@@ -14,9 +14,9 @@ class Kelashelper
     public static function paginate()
     {
         // Memilih kolom-kolom tertentu dari tabel Kelas beserta informasi terkait pengguna dan kategori
-        $kelas = Kelas::select('nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'category.nama_category', 'kelas.created_at')
+        $kelas = Kelas::select('nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'category_kelas.nama', 'kelas.created_at')
             ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa') // Melakukan JOIN dengan tabel users berdasarkan kolom id
-            ->join('category', 'category.id', '=', 'kelas.r_id_category') // Melakukan JOIN dengan tabel category berdasarkan kolom id
+            ->join('category_kelas', 'kelas.id', '=', 'kelas.r_id_category') // Melakukan JOIN dengan tabel category berdasarkan kolom id
             ->latest() // Mengurutkan hasil dari yang terbaru berdasarkan kolom created_at
             ->paginate(8); // Melakukan paginasi dengan menampilkan 8 entri per halaman
 
@@ -27,9 +27,9 @@ class Kelashelper
     public static function paginateall()
     {
         // Memilih kolom-kolom tertentu dari tabel Kelas beserta informasi terkait pengguna dan kategori
-        $kelas = Kelas::select('nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'category.nama_category', 'kelas.created_at')
+        $kelas = Kelas::select('nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'category_kelas.nama', 'kelas.created_at')
             ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa') // Melakukan JOIN dengan tabel users berdasarkan kolom id
-            ->join('category', 'category.id', '=', 'kelas.r_id_category') // Melakukan JOIN dengan tabel category berdasarkan kolom id
+            ->join('category_kelas', 'kelas.id', '=', 'kelas.r_id_category') // Melakukan JOIN dengan tabel category berdasarkan kolom id
             ->inRandomOrder() // Mengambil hasil secara acak
             ->paginate(4); // Melakukan paginasi dengan menampilkan 4 entri per halaman
 
@@ -49,9 +49,9 @@ class Kelashelper
     public static function get_kelas()
     {
         // Memilih kolom-kolom tertentu dari tabel Kelas beserta informasi terkait pengguna dan kategori
-        $kelas = Kelas::select('kelas.id', 'nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'category.nama_category', 'kelas.created_at')
+        $kelas = Kelas::select('kelas.id', 'nama', 'deskripsi', 'foto_thumbnail', 'users.name', 'users.photo', 'category_kelas.nama', 'kelas.created_at')
             ->join('users', 'users.id', '=', 'kelas.r_id_non_siswa') // Melakukan JOIN dengan tabel users berdasarkan kolom id
-            ->join('category', 'category.id', '=', 'kelas.r_id_category') // Melakukan JOIN dengan tabel category berdasarkan kolom id
+            ->join('category_kelas', 'kelas.id', '=', 'kelas.r_id_category') // Melakukan JOIN dengan tabel category berdasarkan kolom id
             ->latest() // Mengurutkan hasil dari yang terbaru berdasarkan kolom created_at
             ->paginate(10); // Melakukan paginasi dengan menampilkan 10 entri per halaman
 

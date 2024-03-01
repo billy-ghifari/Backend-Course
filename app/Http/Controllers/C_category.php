@@ -16,7 +16,7 @@ class C_category extends Controller
     {
         // Validasi data yang diterima dari request
         $validator = Validator::make($request->all(), [
-            'nama_category' => 'required'
+            'nama' => 'required'
         ]);
 
         // Jika validasi gagal, kembalikan respons dengan kode status 422 dan pesan error validasi
@@ -73,7 +73,7 @@ class C_category extends Controller
 
         // Validasi data yang diterima dari request
         $validator = Validator::make($request->all(), [
-            'nama_category' => 'required'
+            'nama' => 'required'
         ]);
 
         // Jika validasi gagal, kembalikan respons dengan pesan error validasi

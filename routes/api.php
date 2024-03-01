@@ -8,9 +8,8 @@ use App\Http\Controllers\C_category;
 use App\Http\Controllers\C_categoryblog;
 use App\Http\Controllers\C_kelas;
 use App\Http\Controllers\C_materi;
-use App\Http\Controllers\C_mentor;
 use App\Http\Controllers\C_Review;
-use Illuminate\Support\Facades\Password;
+use App\Http\Controllers\C_trash;
 
 /*
 |--------------------------------------------------------------------------
@@ -123,6 +122,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('createreview', 'post_review')->middleware('forStatus:aktif');
         Route::delete('/deletereview/{id}', 'destroy')->middleware('forStatus:aktif');
     });
+
+    //trash
+    Route::get('/trash-activities', [C_trash::class, 'trash'])
+        ->name('trash-activities.trash');
+
+    Route::put('/trash-activities/restore/{id}', [C_trash::class, 'restore'])
+        ->name('trash-activities.restore');
+
+    Route::delete('/trash-activities/destroy/{id}', [C_trash::class, 'destroy'])
+        ->name('trash-activities.destroy');
 });
 
 Route::any('/{any}', function () {

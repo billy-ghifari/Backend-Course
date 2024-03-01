@@ -12,7 +12,7 @@ class CategoryHelper
     {
         // Membuat entri baru dalam tabel Category dengan menggunakan data yang telah divalidasi
         $category = Category::create([
-            'nama_category' => $validatedData['nama_category'] // Mengambil nilai 'nama_category' dari data yang divalidasi
+            'nama' => $validatedData['nama'] // Mengambil nilai 'nama_category' dari data yang divalidasi
         ]);
 
         // Mengembalikan entri Category yang baru saja dibuat
@@ -44,7 +44,7 @@ class CategoryHelper
     {
         // Memperbarui entri kategori dengan data yang diberikan
         $category->update([
-            'nama_category' => $requestData['nama_category'] // Memperbarui nilai 'nama_category' dengan nilai yang diberikan dari $requestData
+            'nama' => $requestData['nama'] // Memperbarui nilai 'nama_category' dengan nilai yang diberikan dari $requestData
         ]);
 
         // Mengembalikan respons JSON yang menyatakan bahwa data berhasil diubah bersama dengan detail data kategori yang telah diperbarui

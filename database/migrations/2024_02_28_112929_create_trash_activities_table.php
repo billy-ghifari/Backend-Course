@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('trash_activities', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('model_id');
-            $table->foreignId('deleted_by')->constrained('users');
             $table->timestamps();
             $table->softDeletes();
         });

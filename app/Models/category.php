@@ -12,7 +12,7 @@ class category extends Model
 
     protected $primarykey = 'id';
 
-    protected $table = 'category';
+    protected $table = 'category_kelas';
 
     protected $guarded = ['id'];
 
